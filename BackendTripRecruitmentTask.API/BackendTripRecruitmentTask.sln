@@ -1,6 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask", "BackendTripRecruitmentTask.csproj", "{71DD1AFA-3116-4440-9B1B-55DF7B3C4EBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.API", "BackendTripRecruitmentTask.API.csproj", "{6695CC8C-B9A9-488F-BF70-19619DE2C155}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Application", "..\BackendTripRecruitmentTask.Application\BackendTripRecruitmentTask.Application.csproj", "{A249FEF7-C15C-4885-9D7D-1E7903E69C53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.ApplicationContracts", "..\BackendTripRecruitmentTask.ApplicationContracts\BackendTripRecruitmentTask.ApplicationContracts.csproj", "{1DAA4E55-DCC6-450C-BA58-1A93107BF0CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Domain", "..\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj", "{C79B14E2-412B-4ED1-8D1B-ABA04B81685C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Infrastructure", "..\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj", "{0E435919-4596-430F-A0B6-7E79A4CE5C6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +16,25 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{71DD1AFA-3116-4440-9B1B-55DF7B3C4EBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{71DD1AFA-3116-4440-9B1B-55DF7B3C4EBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{71DD1AFA-3116-4440-9B1B-55DF7B3C4EBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{71DD1AFA-3116-4440-9B1B-55DF7B3C4EBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6695CC8C-B9A9-488F-BF70-19619DE2C155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6695CC8C-B9A9-488F-BF70-19619DE2C155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6695CC8C-B9A9-488F-BF70-19619DE2C155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6695CC8C-B9A9-488F-BF70-19619DE2C155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A249FEF7-C15C-4885-9D7D-1E7903E69C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A249FEF7-C15C-4885-9D7D-1E7903E69C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A249FEF7-C15C-4885-9D7D-1E7903E69C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A249FEF7-C15C-4885-9D7D-1E7903E69C53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DAA4E55-DCC6-450C-BA58-1A93107BF0CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DAA4E55-DCC6-450C-BA58-1A93107BF0CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DAA4E55-DCC6-450C-BA58-1A93107BF0CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DAA4E55-DCC6-450C-BA58-1A93107BF0CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C79B14E2-412B-4ED1-8D1B-ABA04B81685C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C79B14E2-412B-4ED1-8D1B-ABA04B81685C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C79B14E2-412B-4ED1-8D1B-ABA04B81685C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C79B14E2-412B-4ED1-8D1B-ABA04B81685C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E435919-4596-430F-A0B6-7E79A4CE5C6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E435919-4596-430F-A0B6-7E79A4CE5C6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E435919-4596-430F-A0B6-7E79A4CE5C6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E435919-4596-430F-A0B6-7E79A4CE5C6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
