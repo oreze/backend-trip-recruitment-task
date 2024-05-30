@@ -1,7 +1,6 @@
 using System.Globalization;
 using BackendTripRecruitmentTask.Domain.Entities;
 using BackendTripRecruitmentTask.Infrastructure.Data;
-using Bogus.DataSets;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 

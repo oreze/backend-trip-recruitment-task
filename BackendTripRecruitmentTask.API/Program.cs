@@ -2,8 +2,14 @@ using BackendTripRecruitmentTask.API.Middlewares;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using BackendTripRecruitmentTask.Infrastructure.Seeders;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, lc) => lc
+    .WriteTo.Console()
+    .Enrich.FromLogContext()
+    .ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddDbContext<TripDbContext>(
     options => options.UseInMemoryDatabase("TripDb"));
