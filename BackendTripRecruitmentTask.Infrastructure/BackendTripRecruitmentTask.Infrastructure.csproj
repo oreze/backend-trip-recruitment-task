@@ -7,11 +7,25 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Bogus" Version="35.5.1" />
+      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.6" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Seeders\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Seeders\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Seeders\**" />
     </ItemGroup>
 
 </Project>
