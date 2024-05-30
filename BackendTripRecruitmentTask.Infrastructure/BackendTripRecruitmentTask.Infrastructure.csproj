@@ -16,16 +16,4 @@
       <ProjectReference Include="..\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Remove="Seeders\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Remove="Seeders\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Seeders\**" />
-    </ItemGroup>
-
 </Project>

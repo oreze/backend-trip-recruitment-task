@@ -1,5 +1,6 @@
 using BackendTripRecruitmentTask.API.Middlewares;
 using BackendTripRecruitmentTask.Infrastructure.Data;
+using BackendTripRecruitmentTask.Infrastructure.Seeders;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<CustomExceptionHandlerMiddleware>();
+
+await DbSeeder.EnsureDatabaseSeeded(app);
 
 app.UseSwagger();
 app.UseSwaggerUI();
