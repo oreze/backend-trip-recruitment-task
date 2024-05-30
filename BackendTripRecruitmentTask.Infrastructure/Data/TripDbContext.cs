@@ -4,8 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BackendTripRecruitmentTask.Infrastructure.Data;
 
-public class TripDbContext(DbContextOptions<TripDbContext> options) : DbContext(options)
+public class TripDbContext : DbContext
 {
+    public TripDbContext(DbContextOptions<TripDbContext> options) : base(options)
+    {
+    }
+
     public virtual DbSet<Trip> Trips { get; set; }
     public virtual DbSet<Registration> Registrations { get; set; }
     public virtual DbSet<Country> Countries { get; set; }

@@ -4,7 +4,7 @@ namespace BackendTripRecruitmentTask.Domain.Entities;
 
 public class Trip
 {
-    public string ID { get; set; }
+    public int ID { get; set; }
     public string Name { get; private set; }
     public string? Description { get; private set; }
     public DateTime StartDate { get; private set; }

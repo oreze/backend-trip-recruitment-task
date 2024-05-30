@@ -12,16 +12,16 @@ public class TripEntityConfiguration: IEntityTypeConfiguration<Trip>
 
         builder.Property(i => i.Name).HasMaxLength(50).IsRequired();
         builder.Property(i => i.Description);
-        builder.Property(i => i.Country).HasMaxLength(20).IsRequired();
         builder.Property(i => i.StartDate).IsRequired();
         builder.Property(i => i.NumberOfSeats).IsRequired();
 
         builder.HasMany(i => i.Registrations)
-            .WithOne()
+            .WithOne(i => i.Trip)
             .HasForeignKey(i => i.TripID);
-        
+
         builder.HasOne(i => i.Country)
             .WithMany()
-            .HasForeignKey(i => i.CountryThreeLetterCode);
+            .HasForeignKey(i => i.CountryThreeLetterCode)
+            .IsRequired();
     }
 }
