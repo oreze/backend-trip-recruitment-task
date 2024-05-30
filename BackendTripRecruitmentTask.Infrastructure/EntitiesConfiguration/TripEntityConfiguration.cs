@@ -23,5 +23,8 @@ public class TripEntityConfiguration: IEntityTypeConfiguration<Trip>
             .WithMany()
             .HasForeignKey(i => i.CountryThreeLetterCode)
             .IsRequired();
+
+        builder.HasIndex(i => i.Name)
+            .IsUnique();
     }
 }
