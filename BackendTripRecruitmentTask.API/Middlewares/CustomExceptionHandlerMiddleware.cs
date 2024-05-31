@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using BackendTripRecruitmentTask.Application.DTOs.Common;
+using BackendTripRecruitmentTask.Application.Dtos.Common;
 using BackendTripRecruitmentTask.Domain.Exceptions;
 using Serilog;
 using Serilog.Context;
