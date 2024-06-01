@@ -1,5 +1,6 @@
 using BackendTripRecruitmentTask.Application.Commands;
 using BackendTripRecruitmentTask.Application.Dtos.Trips;
+using BackendTripRecruitmentTask.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ public class TripsController(IMediator mediator) : ControllerBase
     {
         var command = new CreateTripCommand(createTripDto);
         var result = await _mediator.Send(command);
-        
+
         return Ok(result);
     }
 
@@ -39,7 +40,10 @@ public class TripsController(IMediator mediator) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> ListAllTrips()
     {
-        throw new NotImplementedException();
+        var query = new GetAllTripsQuery();
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
     }
 
     // GET api/trip/country/{country}

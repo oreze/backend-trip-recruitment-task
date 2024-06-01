@@ -52,4 +52,10 @@ public class TripService(TripDbContext dbContext) : ITripService
         await _dbContext.SaveChangesAsync();
         return true;
     }
+
+    public async Task<IEnumerable<TripListDto>> GetAll() => 
+        await _dbContext.Trips
+            .Include(x => x.Country)
+            .Select(x => new TripListDto(x.Name, x.Country.Name, x.StartDate))
+            .ToListAsync();
 }
