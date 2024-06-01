@@ -11,6 +11,7 @@ public class CountryEntityConfiguration : IEntityTypeConfiguration<Country>
     {
         builder.HasKey(i => i.ThreeLetterCode);
 
+        builder.Property(x => x.ThreeLetterCode).HasMaxLength(3);
         builder.Property(i => i.Name).HasMaxLength(Constants.MaximumCountryNameLength).IsRequired();
     }
 }
