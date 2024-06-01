@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.Serialization.Json;
 using BackendTripRecruitmentTask.Domain.Exceptions;
 
 namespace BackendTripRecruitmentTask.Domain.Entities;
@@ -15,10 +16,15 @@ public class Country
 
         foreach (var culture in cultures)
         {
-            var region = new RegionInfo(culture.LCID);
             // not sure if it contains all countries, it would be a better idea to just use external nuget/api
             // taking care of that
-            countries.TryAdd(region.ThreeLetterISORegionName, region.EnglishName);
+            var region = new RegionInfo(culture.Name);
+
+            if (string.IsNullOrWhiteSpace(region.ThreeLetterISORegionName) || string.IsNullOrWhiteSpace(region.EnglishName))
+                continue;
+            
+            string name = TrimTo20Characters(region.EnglishName);
+            countries.TryAdd(region.ThreeLetterISORegionName, name);
         }
 
         return countries.Select(kvp => Create(kvp.Key, kvp.Value));
@@ -43,8 +49,19 @@ public class Country
         if (string.IsNullOrWhiteSpace(name))
             throw new InputException(nameof(name), "Country name cannot be null or empty.");
 
-        if (name.Length <= 20)
+        if (name.Length > 20)
             throw new InputException(nameof(name), "Country name has max length of 20 characters.");
+    }
+
+    private static string TrimTo20Characters(string input)
+    {
+        string result = input;
+        if (input.Length > 20)
+        {
+            result = result.Substring(0, 20);
+        }
+
+        return result;
     }
 
 }
