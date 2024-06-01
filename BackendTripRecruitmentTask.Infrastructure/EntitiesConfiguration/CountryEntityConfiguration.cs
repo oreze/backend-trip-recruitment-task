@@ -1,3 +1,4 @@
+using BackendTripRecruitmentTask.Domain;
 using BackendTripRecruitmentTask.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,6 +11,6 @@ public class CountryEntityConfiguration : IEntityTypeConfiguration<Country>
     {
         builder.HasKey(i => i.ThreeLetterCode);
 
-        builder.Property(i => i.Name).HasMaxLength(20).IsRequired();
+        builder.Property(i => i.Name).HasMaxLength(Constants.MaximumCountryNameLength).IsRequired();
     }
 }

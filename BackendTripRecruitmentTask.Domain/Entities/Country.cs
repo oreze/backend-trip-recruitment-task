@@ -23,7 +23,7 @@ public class Country
                 string.IsNullOrWhiteSpace(region.EnglishName))
                 continue;
 
-            var name = TrimTo20Characters(region.EnglishName);
+            var name = TrimToXCharacters(region.EnglishName, Constants.MaximumCountryNameLength);
             countries.TryAdd(region.ThreeLetterISORegionName, name);
         }
 
@@ -46,17 +46,21 @@ public class Country
         if (string.IsNullOrWhiteSpace(threeLetterCode))
             throw new InputException(nameof(threeLetterCode), "Country code cannot be null or empty.");
 
+        if (threeLetterCode.Length != 3)
+            throw new InputException(nameof(threeLetterCode), "Country code must be 3 characters long.");
+
         if (string.IsNullOrWhiteSpace(name))
             throw new InputException(nameof(name), "Country name cannot be null or empty.");
 
-        if (name.Length > 20)
-            throw new InputException(nameof(name), "Country name has max length of 20 characters.");
+        if (name.Length > Constants.MaximumCountryNameLength)
+            throw new InputException(nameof(name),
+                $"Country name has max length of {Constants.MaximumCountryNameLength} characters.");
     }
 
-    private static string TrimTo20Characters(string input)
+    private static string TrimToXCharacters(string input, int maxCharNumber)
     {
         var result = input;
-        if (input.Length > 20) result = result.Substring(0, 20);
+        if (input.Length > maxCharNumber) result = result.Substring(0, maxCharNumber);
 
         return result;
     }
