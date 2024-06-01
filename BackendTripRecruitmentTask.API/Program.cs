@@ -1,3 +1,4 @@
+using System.Reflection;
 using BackendTripRecruitmentTask.API.Middlewares;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using BackendTripRecruitmentTask.Infrastructure.Seeders;
@@ -13,6 +14,11 @@ builder.Host.UseSerilog((context, lc) => lc
 
 builder.Services.AddDbContext<TripDbContext>(
     options => options.UseInMemoryDatabase("TripDb"));
+
+// https://github.com/jbogard/MediatR/issues/984 - AppDomain.CurrentDomain.GetAssemblies() didn't load all assemblies, 
+// eg. BackendTripRecruitmentTask.Application. This way it's loaded explicitly.
+var assemblyWithHandlers = Assembly.Load("BackendTripRecruitmentTask.Application");
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assemblyWithHandlers));
 
 builder.Services.AddControllers();
 
