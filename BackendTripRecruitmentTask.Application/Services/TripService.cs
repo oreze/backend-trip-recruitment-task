@@ -39,4 +39,22 @@ public class TripService(TripDbContext dbContext) : ITripService
 
         return trip.ID;
     }
+
+    public async Task<bool> DeleteTrip(string name)
+    {
+        var registrationsForTrip = _dbContext.Registrations
+            .Include(x => x.Trip)
+            .Where(x => x.Trip.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        
+        _dbContext.RemoveRange(registrationsForTrip);
+
+        var tripToBeDeleted = await _dbContext.Trips.FirstOrDefaultAsync(x => x.Name == name);
+
+        if (tripToBeDeleted == default)
+            return false;
+
+        _dbContext.Remove(tripToBeDeleted);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
 }

@@ -4,10 +4,10 @@ using MediatR;
 
 namespace BackendTripRecruitmentTask.Application.Handlers;
 
-public class CreateTripHandler(ITripService tripService): IRequestHandler<CreateTripCommand, int>
+public class DeleteTripCommandHandler(ITripService tripService): IRequestHandler<DeleteTripCommand, bool>
 {
     private readonly ITripService _tripService = tripService ?? throw new ArgumentNullException(nameof(tripService));
     
-    public async Task<int> Handle(CreateTripCommand request, CancellationToken cancellationToken) =>
-        await _tripService.CreateTrip(request.CreateTripDto);
+    public async Task<bool> Handle(DeleteTripCommand request, CancellationToken cancellationToken) =>
+        await _tripService.DeleteTrip(request.Name);
 }
