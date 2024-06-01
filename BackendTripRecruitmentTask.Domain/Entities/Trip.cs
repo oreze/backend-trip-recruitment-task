@@ -5,15 +5,17 @@ namespace BackendTripRecruitmentTask.Domain.Entities;
 public class Trip
 {
     public int ID { get; set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
     public DateTime StartDate { get; private set; }
     public int NumberOfSeats { get; private set; }
 
-    public Country Country { get; private set; }
-    public string CountryThreeLetterCode { get; }
+    public Country Country { get; private set; } = null!;
+    public string CountryThreeLetterCode { get; } = null!;
     public IList<Registration> Registrations { get; private set; } = new List<Registration>();
 
+    private Trip() {}
+    
     public static Trip Create(string name, string? description, DateTime startDate, int numberOfSeats, Country country)
     {
         ValidateInput(name, description, startDate, numberOfSeats, country);

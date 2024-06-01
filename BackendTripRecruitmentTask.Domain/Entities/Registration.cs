@@ -6,11 +6,13 @@ namespace BackendTripRecruitmentTask.Domain.Entities;
 public class Registration
 {
     public int ID { get; set; }
-    public string Email { get; private set; }
+    public string Email { get; private set; } = null!;
     public DateTime RegisteredAt { get; private set; }
 
     public int TripID { get; }
-    public Trip Trip { get; private set; }
+    public Trip Trip { get; private set; } = null!;
+
+    private Registration() {}
 
     public static Registration Create(string email, Trip trip)
     {
