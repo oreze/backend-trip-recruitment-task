@@ -49,6 +49,9 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate next)
             case InputException:
                 code = HttpStatusCode.BadRequest;
                 break;
+            case NotFoundException:
+                code = HttpStatusCode.NotFound;
+                break;
             case UnauthorizedAccessException:
                 code = HttpStatusCode.Unauthorized;
                 break;

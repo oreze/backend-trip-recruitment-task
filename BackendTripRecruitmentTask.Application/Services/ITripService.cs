@@ -8,4 +8,5 @@ public interface ITripService
     public Task<bool> DeleteTrip(int id);
     public Task<IEnumerable<TripListDto>> GetAll();
     public Task<IEnumerable<TripSearchDto>> GetByCountry(string country);
+    public Task<TripDetailsDto> GetDetails(int id);
 }

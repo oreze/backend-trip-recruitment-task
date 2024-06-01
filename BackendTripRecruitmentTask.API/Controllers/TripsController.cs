@@ -1,5 +1,6 @@
 using BackendTripRecruitmentTask.Application.Commands;
 using BackendTripRecruitmentTask.Application.Dtos.Trips;
+using BackendTripRecruitmentTask.Application.Handlers;
 using BackendTripRecruitmentTask.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +61,10 @@ public class TripsController(IMediator mediator) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetSingleTrip(int id)
     {
-        throw new NotImplementedException();
+        var query = new GetSingleTripQuery(id);
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
     }
 
     // POST api/trip/{id}/register

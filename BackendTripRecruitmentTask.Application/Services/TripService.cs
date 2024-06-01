@@ -69,4 +69,21 @@ public class TripService(TripDbContext dbContext) : ITripService
             .Select(x => new TripSearchDto(x.Name, x.Country.Name, x.StartDate))
             .ToListAsync();
     }
+
+    public async Task<TripDetailsDto> GetDetails(int id)
+    {
+        var trip = await _dbContext.Trips
+            .Include(x => x.Country)
+            .Include(x => x.Registrations)
+            .SingleOrDefaultAsync(x => x.ID == id);
+
+        if (trip == default)
+            throw new NotFoundException("Could not find trip with ID {id}.");
+
+        var registrationsForTrip = trip.Registrations
+            .Select(x => new RegistrationDetailsDto(x.Email, x.RegisteredAt));
+
+        return new TripDetailsDto(trip.Name, trip.Country.Name, trip.Description,
+            trip.StartDate, trip.NumberOfSeats, registrationsForTrip);
+    }
 }
