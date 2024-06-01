@@ -1,5 +1,6 @@
 using System.Reflection;
 using BackendTripRecruitmentTask.API.Middlewares;
+using BackendTripRecruitmentTask.Application.Services;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using BackendTripRecruitmentTask.Infrastructure.Seeders;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<TripDbContext>(
 // eg. BackendTripRecruitmentTask.Application. This way it's loaded explicitly.
 var assemblyWithHandlers = Assembly.Load("BackendTripRecruitmentTask.Application");
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assemblyWithHandlers));
+
+builder.Services.AddScoped<ITripService, TripService>();
 
 builder.Services.AddControllers();
 
