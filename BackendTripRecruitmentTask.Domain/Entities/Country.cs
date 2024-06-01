@@ -5,10 +5,12 @@ namespace BackendTripRecruitmentTask.Domain.Entities;
 
 public class Country
 {
+    private Country()
+    {
+    }
+
     public string ThreeLetterCode { get; private set; } = null!;
     public string Name { get; private set; } = null!;
-
-    private Country() {}
 
     public static IEnumerable<Country> GetAllCountries()
     {

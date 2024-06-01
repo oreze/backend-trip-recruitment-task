@@ -4,6 +4,10 @@ namespace BackendTripRecruitmentTask.Domain.Entities;
 
 public class Trip
 {
+    private Trip()
+    {
+    }
+
     public int ID { get; set; }
     public string Name { get; private set; } = null!;
     public string? Description { get; private set; }
@@ -14,8 +18,6 @@ public class Trip
     public string CountryThreeLetterCode { get; } = null!;
     public IList<Registration> Registrations { get; private set; } = new List<Registration>();
 
-    private Trip() {}
-    
     public static Trip Create(string name, string? description, DateTime startDate, int numberOfSeats, Country country)
     {
         ValidateInput(name, description, startDate, numberOfSeats, country);
@@ -57,10 +59,10 @@ public class Trip
         if (description != null && description.Trim() == string.Empty)
             throw new InputException(nameof(description), "Trip description cannot be empty or whitespace string.");
 
-        if (startDate >= DateTime.UtcNow)
+        if (startDate < DateTime.UtcNow)
             throw new InputException(nameof(startDate), "Trip start date must be in the future.");
 
-        if (numberOfSeats is >= 1 and <= 100)
+        if (numberOfSeats is < 1 or > 100)
             throw new InputException(nameof(numberOfSeats),
                 "Trip number of seats must be between 1 and 100 inclusive.");
 
