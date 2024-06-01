@@ -12,7 +12,6 @@ public class CountryEntityConfigurationTests
     [Fact]
     public void Configure_SetsConfigurationProperly()
     {
-        // Arrange
         var options = new DbContextOptionsBuilder<TripDbContext>()
             .UseInMemoryDatabase("test_database")
             .Options;
@@ -21,10 +20,8 @@ public class CountryEntityConfigurationTests
         var builder = new ModelBuilder(new ConventionSet());
         var configuration = new CountryEntityConfiguration();
 
-        // Act
         configuration.Configure(builder.Entity<Country>());
 
-        // Assert
         var entityType = dbContext.Model.FindEntityType(typeof(Country));
         Assert.NotNull(entityType);
 

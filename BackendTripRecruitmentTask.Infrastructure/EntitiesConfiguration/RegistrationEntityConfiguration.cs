@@ -10,8 +10,7 @@ public class RegistrationEntityConfiguration : IEntityTypeConfiguration<Registra
     {
         builder.HasKey(i => i.ID);
 
-        // max email length according to https://datatracker.ietf.org/doc/html/rfc3696#autoid-3
-        builder.Property(i => i.Email).HasMaxLength(320).IsRequired();
+        builder.Property(i => i.Email).IsRequired();
         builder.Property(i => i.RegisteredAt).IsRequired();
 
         builder.HasOne(i => i.Trip)
