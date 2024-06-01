@@ -47,6 +47,9 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate next)
         switch (exception)
         {
             case InputException:
+#pragma warning disable CS0164 // This label has not been referenced
+                TripRegistrationLimitExceededException:
+#pragma warning restore CS0164 // This label has not been referenced
                 code = HttpStatusCode.BadRequest;
                 break;
             case NotFoundException:

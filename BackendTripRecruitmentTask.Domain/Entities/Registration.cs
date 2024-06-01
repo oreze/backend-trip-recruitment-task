@@ -12,28 +12,25 @@ public class Registration
     public int TripID { get; }
     public Trip Trip { get; private set; }
 
-    public static Registration Create(string email, DateTime registeredAt, Trip trip)
+    public static Registration Create(string email, Trip trip)
     {
-        ValidateInput(email, registeredAt, trip);
+        ValidateInput(email, trip);
 
         return new Registration
         {
             Email = email,
-            RegisteredAt = registeredAt,
+            RegisteredAt = DateTime.UtcNow,
             Trip = trip
         };
     }
 
-    private static void ValidateInput(string email, DateTime registeredAt, Trip trip)
+    private static void ValidateInput(string email, Trip trip)
     {
         if (string.IsNullOrWhiteSpace(email))
             throw new InputException(nameof(email), "Registration email cannot be null or empty.");
 
         if (!MailAddress.TryCreate(email, out var mailAddress))
             throw new InputException(nameof(email), "Registration email is not a valid email address.");
-
-        if (registeredAt >= DateTime.UtcNow)
-            throw new InputException(nameof(registeredAt), "Registration date cannot be in the future.");
 
         if (trip == default)
             throw new InputException(nameof(trip), "Registration trip cannot be null.");

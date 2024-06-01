@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using BackendTripRecruitmentTask.Domain.Exceptions;
 
 namespace BackendTripRecruitmentTask.Domain.Entities;
@@ -28,7 +27,7 @@ public class Trip
             NumberOfSeats = numberOfSeats
         };
     }
-    
+
     public void Update(string? name, string? description, DateTime? startDate, int? numberOfSeats, Country? country)
     {
         ValidateInput(name ?? Name,

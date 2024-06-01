@@ -42,9 +42,9 @@ public class TripService(TripDbContext dbContext) : ITripService
             .Include(x => x.Country)
             .Include(x => x.Registrations)
             .FirstOrDefaultAsync(x => x.ID == id);
-        
+
         if (tripToBeEdited == default)
-            throw new NotFoundException("Could not find trip with ID {id}.");
+            throw new NotFoundException($"Could not find trip with ID {id}.");
 
         var newCountry = tripToBeEdited.Country;
         if (editTripDto.CountryName != default)
@@ -62,8 +62,8 @@ public class TripService(TripDbContext dbContext) : ITripService
             throw new InputException(nameof(editTripDto.NumberOfSeats),
                 $"Number of seats cannot be lower than number of already registered people. " +
                 $"There are {tripToBeEdited.NumberOfSeats} registered users.");
-        
-        tripToBeEdited.Update(editTripDto.Name, editTripDto.Description, editTripDto.StartDate, 
+
+        tripToBeEdited.Update(editTripDto.Name, editTripDto.Description, editTripDto.StartDate,
             editTripDto.NumberOfSeats, newCountry);
 
         _dbContext.Trips.Update(tripToBeEdited);
@@ -75,7 +75,7 @@ public class TripService(TripDbContext dbContext) : ITripService
         var tripToBeDeleted = await _dbContext.Trips.FirstOrDefaultAsync(x => x.ID == id);
         if (tripToBeDeleted == default)
             return false;
-        
+
         var registrationsForTrip = _dbContext.Registrations
             .Where(x => x.TripID == id);
 
@@ -118,7 +118,27 @@ public class TripService(TripDbContext dbContext) : ITripService
         return new TripDetailsDto(trip.Name, trip.Country.Name, trip.Description,
             trip.StartDate, trip.NumberOfSeats, registrationsForTrip);
     }
-    
-    
-    
+
+    public async Task Register(int tripID, string email)
+    {
+        var trip = await _dbContext.Trips
+            .Include(x => x.Registrations)
+            .FirstOrDefaultAsync(x => x.ID == tripID);
+
+        if (trip == default)
+            throw new NotFoundException($"Could not find trip with ID {tripID}.");
+
+        if (trip.Registrations.Count >= trip.NumberOfSeats)
+            throw new TripRegistrationLimitExceededException(
+                $"The registration limit for trip with ID {tripID} has been exceeded." +
+                $"Number of seats is {trip.NumberOfSeats}.");
+
+        if (trip.Registrations.Any(x => x.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase)))
+            throw new InputException(nameof(email),
+                $"The email address {email} is already registered for trip with ID {tripID}.");
+
+        var registration = Registration.Create(email, trip);
+        await _dbContext.Registrations.AddAsync(registration);
+        await _dbContext.SaveChangesAsync();
+    }
 }

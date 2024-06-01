@@ -1,6 +1,5 @@
 using BackendTripRecruitmentTask.Application.Commands;
 using BackendTripRecruitmentTask.Application.Dtos.Trips;
-using BackendTripRecruitmentTask.Application.Handlers;
 using BackendTripRecruitmentTask.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -74,6 +73,9 @@ public class TripsController(IMediator mediator) : ControllerBase
     [HttpPost("{id}/register")]
     public async Task<IActionResult> RegisterForTrip(int id, string email)
     {
-        throw new NotImplementedException();
+        var command = new RegisterForTripCommand(id, email);
+        await _mediator.Send(command);
+
+        return Ok();
     }
 }
