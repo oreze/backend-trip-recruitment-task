@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using BackendTripRecruitmentTask.Domain.Exceptions;
 
 namespace BackendTripRecruitmentTask.Domain.Entities;
@@ -26,6 +27,21 @@ public class Trip
             StartDate = startDate,
             NumberOfSeats = numberOfSeats
         };
+    }
+    
+    public void Update(string? name, string? description, DateTime? startDate, int? numberOfSeats, Country? country)
+    {
+        ValidateInput(name ?? Name,
+            description ?? Description,
+            startDate ?? StartDate,
+            numberOfSeats ?? NumberOfSeats,
+            country ?? Country);
+
+        Name = name ?? Name;
+        Description = description ?? Description;
+        Country = country ?? Country;
+        StartDate = startDate ?? StartDate;
+        NumberOfSeats = numberOfSeats ?? NumberOfSeats;
     }
 
     private static void ValidateInput(string name, string? description, DateTime startDate, int numberOfSeats,

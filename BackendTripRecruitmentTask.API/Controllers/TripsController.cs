@@ -25,7 +25,10 @@ public class TripsController(IMediator mediator) : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> EditTrip(int id, EditTripDto editTripDto)
     {
-        throw new NotImplementedException();
+        var query = new EditTripCommand(id, editTripDto);
+        await _mediator.Send(query);
+
+        return Ok();
     }
 
     [HttpDelete("{id}")]

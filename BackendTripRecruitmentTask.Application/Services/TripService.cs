@@ -36,18 +36,50 @@ public class TripService(TripDbContext dbContext) : ITripService
         return trip.ID;
     }
 
-    public async Task<bool> DeleteTrip(int ID)
+    public async Task EditTrip(int id, EditTripDto editTripDto)
     {
-        var registrationsForTrip = _dbContext.Registrations
-            .Where(x => x.TripID == ID);
+        var tripToBeEdited = await _dbContext.Trips
+            .Include(x => x.Country)
+            .Include(x => x.Registrations)
+            .FirstOrDefaultAsync(x => x.ID == id);
+        
+        if (tripToBeEdited == default)
+            throw new NotFoundException("Could not find trip with ID {id}.");
 
-        _dbContext.RemoveRange(registrationsForTrip);
+        var newCountry = tripToBeEdited.Country;
+        if (editTripDto.CountryName != default)
+        {
+            newCountry = await _dbContext.Countries.FirstOrDefaultAsync(x =>
+                x.Name.Equals(editTripDto.CountryName, StringComparison.InvariantCultureIgnoreCase));
 
-        var tripToBeDeleted = await _dbContext.Trips.FirstOrDefaultAsync(x => x.ID == ID);
+            if (newCountry == default)
+                throw new InputException(nameof(editTripDto.CountryName),
+                    $"The country name '{editTripDto.CountryName}' does not exist in the database. " +
+                    $"Try using only English names, for reference check ISO 3166.");
+        }
 
+        if (tripToBeEdited.Registrations.Count > editTripDto.NumberOfSeats)
+            throw new InputException(nameof(editTripDto.NumberOfSeats),
+                $"Number of seats cannot be lower than number of already registered people. " +
+                $"There are {tripToBeEdited.NumberOfSeats} registered users.");
+        
+        tripToBeEdited.Update(editTripDto.Name, editTripDto.Description, editTripDto.StartDate, 
+            editTripDto.NumberOfSeats, newCountry);
+
+        _dbContext.Trips.Update(tripToBeEdited);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<bool> DeleteTrip(int id)
+    {
+        var tripToBeDeleted = await _dbContext.Trips.FirstOrDefaultAsync(x => x.ID == id);
         if (tripToBeDeleted == default)
             return false;
+        
+        var registrationsForTrip = _dbContext.Registrations
+            .Where(x => x.TripID == id);
 
+        _dbContext.RemoveRange(registrationsForTrip);
         _dbContext.Remove(tripToBeDeleted);
         await _dbContext.SaveChangesAsync();
         return true;
@@ -86,4 +118,7 @@ public class TripService(TripDbContext dbContext) : ITripService
         return new TripDetailsDto(trip.Name, trip.Country.Name, trip.Description,
             trip.StartDate, trip.NumberOfSeats, registrationsForTrip);
     }
+    
+    
+    
 }
