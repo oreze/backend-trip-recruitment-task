@@ -3,4 +3,4 @@ using MediatR;
 
 namespace BackendTripRecruitmentTask.Application.Queries;
 
-public record GetAllTripsQuery : IRequest<IEnumerable<TripListDto>>;
+public record SearchTripsByCountryQuery(string Country) : IRequest<IEnumerable<TripSearchDto>>;

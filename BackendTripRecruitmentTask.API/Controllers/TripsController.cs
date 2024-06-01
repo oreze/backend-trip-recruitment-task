@@ -50,7 +50,10 @@ public class TripsController(IMediator mediator) : ControllerBase
     [HttpGet("country/{country}")]
     public async Task<IActionResult> SearchTripsByCountry(string country)
     {
-        throw new NotImplementedException();
+        var query = new SearchTripsByCountryQuery(country);
+        var result = await _mediator.Send(query);
+
+        return Ok(country);
     }
 
     // GET api/trip/{id}

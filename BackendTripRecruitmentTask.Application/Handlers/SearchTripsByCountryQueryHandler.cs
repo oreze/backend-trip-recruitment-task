@@ -5,13 +5,14 @@ using MediatR;
 
 namespace BackendTripRecruitmentTask.Application.Handlers;
 
-public class GetAllTripsQueryHandler(ITripService tripService)
-    : IRequestHandler<GetAllTripsQuery, IEnumerable<TripListDto>>
+public class SearchTripsByCountryQueryHandler(ITripService tripService)
+    : IRequestHandler<SearchTripsByCountryQuery, IEnumerable<TripSearchDto>>
 {
     private readonly ITripService _tripService = tripService ?? throw new ArgumentNullException(nameof(tripService));
 
-    public async Task<IEnumerable<TripListDto>> Handle(GetAllTripsQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<TripSearchDto>> Handle(SearchTripsByCountryQuery request,
+        CancellationToken cancellationToken)
     {
-        return await _tripService.GetAll();
+        return await _tripService.GetByCountry(request.Country);
     }
 }

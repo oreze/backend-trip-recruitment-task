@@ -1,6 +1,6 @@
 namespace BackendTripRecruitmentTask.Application.Dtos.Trips;
 
-public record TripListDto(
+public record TripSearchDto(
     string Name,
     string Country,
     DateTime StartDate);

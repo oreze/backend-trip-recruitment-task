@@ -53,9 +53,20 @@ public class TripService(TripDbContext dbContext) : ITripService
         return true;
     }
 
-    public async Task<IEnumerable<TripListDto>> GetAll() => 
-        await _dbContext.Trips
+    public async Task<IEnumerable<TripListDto>> GetAll()
+    {
+        return await _dbContext.Trips
             .Include(x => x.Country)
             .Select(x => new TripListDto(x.Name, x.Country.Name, x.StartDate))
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<TripSearchDto>> GetByCountry(string country)
+    {
+        return await _dbContext.Trips
+            .Include(x => x.Country)
+            .Where(x => x.Country.Name.Equals(country, StringComparison.InvariantCultureIgnoreCase))
+            .Select(x => new TripSearchDto(x.Name, x.Country.Name, x.StartDate))
+            .ToListAsync();
+    }
 }
