@@ -3,4 +3,4 @@ using MediatR;
 
 namespace BackendTripRecruitmentTask.Application.Commands;
 
-public record CreateTripCommand(CreateTripDto CreateTripDto) : IRequest<int>;    
+public record CreateTripCommand(CreateTripDto CreateTripDto) : IRequest<int>;

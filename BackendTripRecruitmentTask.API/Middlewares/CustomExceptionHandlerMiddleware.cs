@@ -4,15 +4,16 @@ using BackendTripRecruitmentTask.Application.Dtos.Common;
 using BackendTripRecruitmentTask.Domain.Exceptions;
 using Serilog;
 using Serilog.Context;
+using ILogger = Serilog.ILogger;
 
 namespace BackendTripRecruitmentTask.API.Middlewares;
 
 public class CustomExceptionHandlerMiddleware(RequestDelegate next)
 {
-    private const string InternalServerErrorMessage = 
+    private const string InternalServerErrorMessage =
         "Something went wrong on our end. Please try again later or contact support if the issue persists. (Error ID: {0})";
-    
-    private static readonly Serilog.ILogger Logger = Log.ForContext<CustomExceptionHandlerMiddleware>();
+
+    private static readonly ILogger Logger = Log.ForContext<CustomExceptionHandlerMiddleware>();
 
     public async Task Invoke(HttpContext context)
     {
@@ -24,7 +25,7 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate next)
         {
             var errorId = Guid.NewGuid();
 
-            using (LogContext.PushProperty("ErrorId", errorId)) 
+            using (LogContext.PushProperty("ErrorId", errorId))
             {
                 Logger.Error(exception, "Error during request execution: {Context}", context.Request.Path.Value);
             }
@@ -42,7 +43,7 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate next)
     {
         HttpStatusCode code;
         string? message = default;
-        
+
         switch (exception)
         {
             case InputException:

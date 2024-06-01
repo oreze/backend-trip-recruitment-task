@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BackendTripRecruitmentTask.Infrastructure.EntitiesConfiguration;
 
-public class CountryEntityConfiguration: IEntityTypeConfiguration<Country>
+public class CountryEntityConfiguration : IEntityTypeConfiguration<Country>
 {
     public void Configure(EntityTypeBuilder<Country> builder)
     {

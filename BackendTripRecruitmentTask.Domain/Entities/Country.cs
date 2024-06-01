@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime.Serialization.Json;
 using BackendTripRecruitmentTask.Domain.Exceptions;
 
 namespace BackendTripRecruitmentTask.Domain.Entities;
@@ -20,32 +19,33 @@ public class Country
             // taking care of that
             var region = new RegionInfo(culture.Name);
 
-            if (string.IsNullOrWhiteSpace(region.ThreeLetterISORegionName) || string.IsNullOrWhiteSpace(region.EnglishName))
+            if (string.IsNullOrWhiteSpace(region.ThreeLetterISORegionName) ||
+                string.IsNullOrWhiteSpace(region.EnglishName))
                 continue;
-            
-            string name = TrimTo20Characters(region.EnglishName);
+
+            var name = TrimTo20Characters(region.EnglishName);
             countries.TryAdd(region.ThreeLetterISORegionName, name);
         }
 
         return countries.Select(kvp => Create(kvp.Key, kvp.Value));
     }
-    
+
     public static Country Create(string threeLetterCode, string name)
     {
         ValidateInput(threeLetterCode, name);
 
-        return new Country()
+        return new Country
         {
             ThreeLetterCode = threeLetterCode,
             Name = name
         };
     }
-    
+
     private static void ValidateInput(string threeLetterCode, string name)
     {
         if (string.IsNullOrWhiteSpace(threeLetterCode))
             throw new InputException(nameof(threeLetterCode), "Country code cannot be null or empty.");
-        
+
         if (string.IsNullOrWhiteSpace(name))
             throw new InputException(nameof(name), "Country name cannot be null or empty.");
 
@@ -55,13 +55,9 @@ public class Country
 
     private static string TrimTo20Characters(string input)
     {
-        string result = input;
-        if (input.Length > 20)
-        {
-            result = result.Substring(0, 20);
-        }
+        var result = input;
+        if (input.Length > 20) result = result.Substring(0, 20);
 
         return result;
     }
-
 }

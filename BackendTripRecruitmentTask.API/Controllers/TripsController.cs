@@ -10,27 +10,27 @@ namespace BackendTripRecruitmentTask.API.Controllers;
 public class TripsController(IMediator mediator) : ControllerBase
 {
     private readonly IMediator _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-    
+
     [HttpPost]
     public async Task<IActionResult> CreateTrip(CreateTripDto createTripDto)
     {
         var command = new CreateTripCommand(createTripDto);
-        int result = await _mediator.Send(command);
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
-    
+
     [HttpPatch("{id}")]
     public async Task<IActionResult> EditTrip(int id, EditTripDto editTripDto)
     {
         throw new NotImplementedException();
     }
-    
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTrip(int id)
     {
         throw new NotImplementedException();
     }
-    
+
     // GET api/trip
     [HttpGet]
     public async Task<IActionResult> ListAllTrips()

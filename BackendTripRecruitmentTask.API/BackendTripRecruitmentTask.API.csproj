@@ -8,15 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+        <PackageReference Include="Serilog.AspNetCore" Version="8.0.1"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BackendTripRecruitmentTask.ApplicationContracts\BackendTripRecruitmentTask.ApplicationContracts.csproj" />
-      <ProjectReference Include="..\BackendTripRecruitmentTask.Application\BackendTripRecruitmentTask.Application.csproj" />
-      <ProjectReference Include="..\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj" />
-      <ProjectReference Include="..\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj" />
+        <ProjectReference Include="..\BackendTripRecruitmentTask.ApplicationContracts\BackendTripRecruitmentTask.ApplicationContracts.csproj"/>
+        <ProjectReference Include="..\BackendTripRecruitmentTask.Application\BackendTripRecruitmentTask.Application.csproj"/>
+        <ProjectReference Include="..\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj"/>
+        <ProjectReference Include="..\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>

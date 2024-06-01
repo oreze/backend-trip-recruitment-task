@@ -1,4 +1,3 @@
-using System.Globalization;
 using BackendTripRecruitmentTask.Domain.Entities;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
@@ -12,8 +11,8 @@ public static class DbSeeder
     {
         using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         var dbContext = scope.ServiceProvider.GetService<TripDbContext>() ??
-                           throw new ArgumentNullException(nameof(TripDbContext));
-        
+                        throw new ArgumentNullException(nameof(TripDbContext));
+
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
 

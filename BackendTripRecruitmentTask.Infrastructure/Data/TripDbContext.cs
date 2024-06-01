@@ -21,4 +21,3 @@ public class TripDbContext : DbContext
         modelBuilder.ApplyConfiguration(new TripEntityConfiguration());
     }
 }
-

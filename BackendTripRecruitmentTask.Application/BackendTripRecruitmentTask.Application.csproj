@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MediatR" Version="12.2.0" />
+        <PackageReference Include="MediatR" Version="12.2.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj" />
+        <ProjectReference Include="..\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>
