@@ -46,6 +46,14 @@ public class TripService(TripDbContext dbContext) : ITripService
         if (tripToBeEdited == default)
             throw new NotFoundException($"Could not find trip with ID {id}.");
 
+        var doesTripWithNameExists = editTripDto.Name != null && await _dbContext.Trips.AnyAsync(x =>
+            x.Name.Equals(editTripDto.Name, StringComparison.InvariantCultureIgnoreCase));
+
+        if (doesTripWithNameExists)
+            throw new InputException(nameof(editTripDto.Name),
+                $"The trip with name '{editTripDto.Name}' already exists in the database. " +
+                $"Try using other name.");
+
         var newCountry = tripToBeEdited.Country;
         if (editTripDto.CountryName != default)
         {

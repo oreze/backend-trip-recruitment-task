@@ -56,7 +56,7 @@ public class TripsController(IMediator mediator) : ControllerBase
         var query = new SearchTripsByCountryQuery(country);
         var result = await _mediator.Send(query);
 
-        return Ok(country);
+        return Ok(result);
     }
 
     // GET api/trip/{id}
