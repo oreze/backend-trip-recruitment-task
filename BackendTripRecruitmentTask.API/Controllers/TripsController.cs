@@ -16,10 +16,11 @@ public class TripsController(IMediator mediator) : ControllerBase
     {
         var command = new CreateTripCommand(createTripDto);
         var result = await _mediator.Send(command);
+        
         return Ok(result);
     }
 
-    [HttpPatch("{id}")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> EditTrip(int id, EditTripDto editTripDto)
     {
         throw new NotImplementedException();
@@ -28,7 +29,10 @@ public class TripsController(IMediator mediator) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTrip(int id)
     {
-        throw new NotImplementedException();
+        var command = new DeleteTripCommand(id);
+        var result = await _mediator.Send(command);
+
+        return Ok(result);
     }
 
     // GET api/trip

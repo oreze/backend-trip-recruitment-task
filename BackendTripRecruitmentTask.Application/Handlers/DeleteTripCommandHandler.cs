@@ -10,6 +10,6 @@ public class DeleteTripCommandHandler(ITripService tripService) : IRequestHandle
 
     public async Task<bool> Handle(DeleteTripCommand request, CancellationToken cancellationToken)
     {
-        return await _tripService.DeleteTrip(request.Name);
+        return await _tripService.DeleteTrip(request.ID);
     }
 }
