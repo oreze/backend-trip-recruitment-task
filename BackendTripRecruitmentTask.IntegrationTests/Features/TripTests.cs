@@ -523,9 +523,9 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task RegisterForTrip_TripDoesNotExist_ReturnsNotFound()
     {
-        var email = "test@example.com";
+        const string email = "test@example.com";
 
-        var response = await _httpClient.PostAsync("/trips/999/register?email={email}", null);
+        var response = await _httpClient.PostAsync($"/trips/{int.MaxValue}/register?email={email}", null);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -544,7 +544,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
         await _dbContext.Trips.AddAsync(trip);
         await _dbContext.SaveChangesAsync();
 
-        var email = "invalid-email";
+        const string email = "invalid-email";
 
         var response = await _httpClient.PostAsync($"/trips/{trip.ID}/register?email={email}", null);
 
