@@ -10,8 +10,9 @@ using Moq.EntityFrameworkCore;
 namespace BackendTripRecruitmentTask.UnitTests.ApplicationTests.ServicesTests;
 
 /// <summary>
-/// These tests are not entirely units, but I want to keep them here as a demonstration of how this service could be tested.
-/// However this logic should be tested in IntegrationTests project
+///     These tests are not entirely units, but I want to keep them here as a demonstration of how this service could be
+///     tested.
+///     However this logic should be tested in IntegrationTests project
 /// </summary>
 public class TripServiceTests
 {
@@ -108,11 +109,11 @@ public class TripServiceTests
     public async Task EditTrip_TripDoesNotExist_ThrowsNotFoundException()
     {
         var editTripDto = new EditTripDto(
-            Name: "New Trip Name",
-            Description: "New Trip Description",
-            StartDate: DateTime.UtcNow.AddDays(1),
-            NumberOfSeats: 100,
-            CountryName: null);
+            "New Trip Name",
+            "New Trip Description",
+            DateTime.UtcNow.AddDays(1),
+            100,
+            null);
 
         var trips = Enumerable.Empty<Trip>();
         _mockDbContext.Setup(db => db.Trips)
@@ -127,11 +128,11 @@ public class TripServiceTests
     public async Task EditTrip_TripWithNameExists_ThrowsInputException()
     {
         var editTripDto = new EditTripDto(
-            Name: "Existing Trip Name",
-            Description: "New Trip Description",
-            StartDate: DateTime.UtcNow.AddDays(1),
-            NumberOfSeats: 100,
-            CountryName: null);
+            "Existing Trip Name",
+            "New Trip Description",
+            DateTime.UtcNow.AddDays(1),
+            100,
+            null);
 
         var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
         PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
@@ -149,11 +150,11 @@ public class TripServiceTests
     public async Task EditTrip_CountryDoesNotExist_ThrowsInputException()
     {
         var editTripDto = new EditTripDto(
-            Name: "New Trip Name",
-            Description: "New Trip Description",
-            StartDate: DateTime.UtcNow.AddDays(1),
-            NumberOfSeats: 100,
-            CountryName: "Random Country That Doesn't Exists");
+            "New Trip Name",
+            "New Trip Description",
+            DateTime.UtcNow.AddDays(1),
+            100,
+            "Random Country That Doesn't Exists");
 
         var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
         PropertyHelper.SetProperty(trip, nameof(Country.Name), "Trip1");
@@ -173,20 +174,20 @@ public class TripServiceTests
     public async Task EditTrip_NumberOfSeatsLowerThanRegisteredUsers_ThrowsInputException()
     {
         var editTripDto = new EditTripDto(
-            Name: "New Trip Name",
-            Description: "New Trip Description",
-            StartDate: DateTime.UtcNow.AddDays(1),
-            NumberOfSeats: 1,
-            CountryName: null);
+            "New Trip Name",
+            "New Trip Description",
+            DateTime.UtcNow.AddDays(1),
+            1,
+            null);
 
         var registrations = new List<Registration>();
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             var registration = (Registration?)Activator.CreateInstance(typeof(Registration), true);
             PropertyHelper.SetProperty(registration, nameof(Registration.TripID), 1);
             registrations.Add(registration!);
         }
-        
+
         var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
         PropertyHelper.SetProperty(trip, nameof(Trip.Name), "Trip1");
         PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
@@ -204,11 +205,11 @@ public class TripServiceTests
     public async Task EditTrip_ValidInput_UpdatesTrip()
     {
         var editTripDto = new EditTripDto(
-            Name: "New Trip Name",
-            Description: "New Trip Description",
-            StartDate: DateTime.UtcNow.AddDays(1),
-            NumberOfSeats: 1,
-            CountryName: "England");
+            "New Trip Name",
+            "New Trip Description",
+            DateTime.UtcNow.AddDays(1),
+            1,
+            "England");
 
         var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
         PropertyHelper.SetProperty(trip, nameof(Trip.Name), "Trip1");
@@ -233,5 +234,48 @@ public class TripServiceTests
         Assert.Equal(editTripDto.StartDate, trip.StartDate);
         Assert.Equal(editTripDto.NumberOfSeats, trip.NumberOfSeats);
         Assert.Equal(england!.Name, trip.Country.Name);
+    }
+
+    [Fact]
+    public async Task DeleteTrip_TripDoesNotExist_ReturnsFalse()
+    {
+        var trips = Enumerable.Empty<Trip>();
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var result = await _tripService.DeleteTrip(1);
+
+        Assert.False(result);
+        _mockDbContext.Verify(db => db.RemoveRange(It.IsAny<IEnumerable<Registration>>()), Times.Never);
+        _mockDbContext.Verify(db => db.Remove(It.IsAny<Trip>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteTrip_TripExists_DeletesTripAndRegistrations()
+    {
+        var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+        PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
+        var trips = new List<Trip> { trip! };
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var registrations = new List<Registration>();
+        for (var i = 0; i < 10; i++)
+        {
+            var registration = (Registration?)Activator.CreateInstance(typeof(Registration), true);
+            PropertyHelper.SetProperty(registration, nameof(Registration.TripID), 1);
+            registrations.Add(registration!);
+        }
+
+        _mockDbContext.Setup(db => db.Registrations)
+            .ReturnsDbSet(registrations);
+
+        var result = await _tripService.DeleteTrip(1);
+
+        Assert.True(result);
+        _mockDbContext.Verify(
+            db => db.RemoveRange(It.Is<IEnumerable<Registration>>(r => r.SequenceEqual(registrations))), Times.Once);
+        _mockDbContext.Verify(db => db.Remove(It.Is<Trip>(t => t.ID == trip.ID)), Times.Once);
+        _mockDbContext.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
