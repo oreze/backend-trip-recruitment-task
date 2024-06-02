@@ -382,7 +382,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task ListAllTrips_NoTrips_ReturnsEmptyList()
     {
-        // TODO: Not the best solution, but I cannot make it work - database is not being cleaned up after each test.
+        // Not the best solution, but I cannot make it work otherwise - database is not being cleaned up after each test.
         // EnsureDeleted/EnsureCreated don't work, it's something that should be taken care of later
         await _dbContext.Database.EnsureDeletedAsync();
         var response = await _httpClient.GetAsync("/trips");
