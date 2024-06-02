@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using BackendTripRecruitmentTask.Application.Dtos.Trips;
+using BackendTripRecruitmentTask.Domain.Entities;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -381,13 +382,69 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task ListAllTrips_NoTrips_ReturnsEmptyList()
     {
-        // Not the best solution, but I cannot make it work - database is not being cleaned up after each test.
+        // TODO: Not the best solution, but I cannot make it work - database is not being cleaned up after each test.
         // EnsureDeleted/EnsureCreated don't work, it's something that should be taken care of later
         await _dbContext.Database.EnsureDeletedAsync();
         var response = await _httpClient.GetAsync("/trips");
 
         response.EnsureSuccessStatusCode();
         var trips = await response.Content.ReadFromJsonAsync<List<TripListDto>>();
+        Assert.Empty(trips!);
+    }
+
+    [Fact]
+    public async Task SearchTripsByCountry_ReturnsTripsForCountry()
+    {
+        var firstTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var secondTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
+        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
+        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
+        firstTripResponse.EnsureSuccessStatusCode();
+
+        var secondTripJson = JsonSerializer.Serialize(secondTripDto);
+        var secondTripContent = new StringContent(secondTripJson, Encoding.UTF8, "application/json");
+        var secondTripResponse = await _httpClient.PostAsync("/trips", secondTripContent);
+        secondTripResponse.EnsureSuccessStatusCode();
+
+        // Act
+        var response = await _httpClient.GetAsync("/trips/country/Poland");
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var trips = await response.Content.ReadFromJsonAsync<List<TripSearchDto>>();
+        Assert.True(trips!.Count >= 2);
+        Assert.Contains(trips,
+            t => t.Name == firstTripDto.Name && t.Country == firstTripDto.CountryName &&
+                 t.StartDate == firstTripDto.StartDate);
+        Assert.Contains(trips,
+            t => t.Name == secondTripDto.Name && t.Country == secondTripDto.CountryName &&
+                 t.StartDate == secondTripDto.StartDate);
+    }
+
+    [Fact]
+    public async Task SearchTripsByCountry_NoTripsForCountry_ReturnsEmptyList()
+    {
+        var newCountry = Country.Create("XXX", "NotExistingCountry");
+        await _dbContext.Countries.AddAsync(Country.Create("XXX", "NotExistingCountry"));
+        await _dbContext.SaveChangesAsync();
+
+        var response = await _httpClient.GetAsync($"/trips/country/{newCountry.Name}");
+
+        response.EnsureSuccessStatusCode();
+        var trips = await response.Content.ReadFromJsonAsync<List<TripSearchDto>>();
         Assert.Empty(trips!);
     }
 }
