@@ -447,4 +447,144 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
         var trips = await response.Content.ReadFromJsonAsync<List<TripSearchDto>>();
         Assert.Empty(trips!);
     }
+
+    [Fact]
+    public async Task GetSingleTrip_TripExists_ReturnsTrip()
+    {
+        var firstTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
+        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
+        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
+        firstTripResponse.EnsureSuccessStatusCode();
+        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
+        Assert.NotEqual(0, tripID);
+
+        for (var i = 0; i < 5; i++)
+        {
+            var registerForTripResponse =
+                await _httpClient.PostAsync($"/trips/{tripID}/register?email=test{i}@test.com", null);
+            registerForTripResponse.EnsureSuccessStatusCode();
+        }
+
+        var response = await _httpClient.GetAsync($"/trips/{tripID}");
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<TripDetailsDto>();
+        Assert.NotNull(result);
+        Assert.Equal(firstTripDto.Name, result.Name);
+        Assert.Equal(firstTripDto.Description, result.Description);
+        Assert.Equal(firstTripDto.StartDate, result.StartDate);
+        Assert.Equal(firstTripDto.NumberOfSeats, result.NumberOfSeats);
+        Assert.Equal(firstTripDto.CountryName, result.Country);
+        Assert.Equal(5, result.RegistrationDetails.Count());
+    }
+
+    [Fact]
+    public async Task GetSingleTrip_TripDoesNotExist_ReturnsNotFound()
+    {
+        var response = await _httpClient.GetAsync($"/trips/{int.MaxValue}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task RegisterForTrip_TripExists_ReturnsOk()
+    {
+        var firstTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
+        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
+        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
+        firstTripResponse.EnsureSuccessStatusCode();
+        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
+        Assert.NotEqual(0, tripID);
+
+        var email = "test@example.com";
+
+        var response = await _httpClient.PostAsync($"/trips/{tripID}/register?email={email}", null);
+
+        response.EnsureSuccessStatusCode();
+        var registration =
+            await _dbContext.Registrations.FirstOrDefaultAsync(r => r.TripID == tripID && r.Email == email);
+        Assert.NotNull(registration);
+    }
+
+    [Fact]
+    public async Task RegisterForTrip_TripDoesNotExist_ReturnsNotFound()
+    {
+        var email = "test@example.com";
+
+        var response = await _httpClient.PostAsync("/trips/999/register?email={email}", null);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task RegisterForTrip_InvalidEmail_ReturnsBadRequest()
+    {
+        var firstTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
+        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
+        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
+        firstTripResponse.EnsureSuccessStatusCode();
+        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
+        Assert.NotEqual(0, tripID);
+
+        var email = "invalid-email";
+
+        // Act
+        var response = await _httpClient.PostAsync($"/trips/{tripID}/register?email={email}", null);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task RegisterForTrip_EmailAlreadyRegistered_ReturnsBadRequest()
+    {
+        var firstTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
+        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
+        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
+        firstTripResponse.EnsureSuccessStatusCode();
+        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
+        Assert.NotEqual(0, tripID);
+
+        var email = "test@example.com";
+
+
+        var trip = await _dbContext.Trips.FirstOrDefaultAsync(r => r.ID == tripID);
+        var registration = Registration.Create(email, trip!);
+        _dbContext.Registrations.Add(registration);
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var response = await _httpClient.PostAsync($"/trips/{trip.ID}/register?email={email}", null);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }
