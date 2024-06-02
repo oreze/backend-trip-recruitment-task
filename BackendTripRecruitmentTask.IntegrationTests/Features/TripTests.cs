@@ -189,19 +189,23 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task EditTrip_TripWithNameExists_ReturnsBadRequest()
     {
         var tripName = Guid.NewGuid().ToString();
-        var createTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var firstTrip = Trip.Create(
             tripName,
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
-
-        var createTripWithDifferentNameDto = new CreateTripDto(
+            country);
+        
+        var secondTrip = Trip.Create(
             tripName + "1",
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
+
+        await _dbContext.AddRangeAsync([firstTrip, secondTrip]);
+        await _dbContext.SaveChangesAsync();
 
         var editTripDto = new EditTripDto(
             tripName + "1",
@@ -210,44 +214,34 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             100,
             "Germany");
 
-        var createTripJson = JsonSerializer.Serialize(createTripDto);
-        var createTripContent = new StringContent(createTripJson, Encoding.UTF8, "application/json");
-        var createTripResponse = await _httpClient.PostAsync("/trips", createTripContent);
-        createTripResponse.EnsureSuccessStatusCode();
-        var tripID = await createTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
-
-        var createTripWithDifferentNameJson = JsonSerializer.Serialize(createTripWithDifferentNameDto);
-        var createTripWithDifferentNameContent =
-            new StringContent(createTripWithDifferentNameJson, Encoding.UTF8, "application/json");
-        var createTripWithDifferentNameResponse =
-            await _httpClient.PostAsync("/trips", createTripWithDifferentNameContent);
-        createTripWithDifferentNameResponse.EnsureSuccessStatusCode();
-
         var editTripJson = JsonSerializer.Serialize(editTripDto);
         var editTripContnet = new StringContent(editTripJson, Encoding.UTF8, "application/json");
-        var editTripResponse = await _httpClient.PutAsync($"/trips/{tripID}", editTripContnet);
+        var editTripResponse = await _httpClient.PutAsync($"/trips/{firstTrip.ID}", editTripContnet);
         Assert.Equal(HttpStatusCode.BadRequest, editTripResponse.StatusCode);
 
-        var updatedTrip = await _dbContext.Trips.Include(x => x.Country).FirstOrDefaultAsync(x => x.ID == tripID);
+        var updatedTrip = await _dbContext.Trips.Include(x => x.Country).FirstOrDefaultAsync(x => x.ID == firstTrip.ID);
         Assert.NotNull(updatedTrip);
-        Assert.Equal(createTripDto.Name, updatedTrip.Name);
-        Assert.Equal(createTripDto.Description, updatedTrip.Description);
-        Assert.Equal(createTripDto.StartDate, updatedTrip.StartDate);
-        Assert.Equal(createTripDto.NumberOfSeats, updatedTrip.NumberOfSeats);
-        Assert.Equal(createTripDto.CountryName, updatedTrip.Country.Name);
+        Assert.Equal(firstTrip.Name, updatedTrip.Name);
+        Assert.Equal(firstTrip.Description, updatedTrip.Description);
+        Assert.Equal(firstTrip.StartDate, updatedTrip.StartDate);
+        Assert.Equal(firstTrip.NumberOfSeats, updatedTrip.NumberOfSeats);
+        Assert.Equal(firstTrip.Country.Name, updatedTrip.Country.Name);
     }
 
 
     [Fact]
     public async Task EditTrip_CountryDoesNotExist_ReturnsBadRequest()
     {
-        var createTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
+        
+        await _dbContext.Trips.AddAsync(trip);
+        await _dbContext.SaveChangesAsync();
 
         var editTripDto = new EditTripDto(
             Guid.NewGuid().ToString(),
@@ -256,16 +250,9 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             100,
             "Non-Existent Country");
 
-        var createTripJson = JsonSerializer.Serialize(createTripDto);
-        var createTripContent = new StringContent(createTripJson, Encoding.UTF8, "application/json");
-        var createTripResponse = await _httpClient.PostAsync("/trips", createTripContent);
-        createTripResponse.EnsureSuccessStatusCode();
-        var tripID = await createTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
-
         var json = JsonSerializer.Serialize(editTripDto);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"/trips/{tripID}", content);
+        var response = await _httpClient.PutAsync($"/trips/{trip.ID}", content);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
