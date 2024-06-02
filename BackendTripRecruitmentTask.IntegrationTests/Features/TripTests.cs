@@ -496,27 +496,24 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task RegisterForTrip_TripExists_ReturnsOk()
     {
-        var firstTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
 
-        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
-        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
-        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
-        firstTripResponse.EnsureSuccessStatusCode();
-        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
+        await _dbContext.Trips.AddAsync(trip);
+        await _dbContext.SaveChangesAsync();
 
-        var email = "test@example.com";
+        const string email = "test@example.com";
 
-        var response = await _httpClient.PostAsync($"/trips/{tripID}/register?email={email}", null);
+        var response = await _httpClient.PostAsync($"/trips/{trip.ID}/register?email={email}", null);
 
         response.EnsureSuccessStatusCode();
         var registration =
-            await _dbContext.Registrations.FirstOrDefaultAsync(r => r.TripID == tripID && r.Email == email);
+            await _dbContext.Registrations.FirstOrDefaultAsync(r => r.TripID == trip.ID && r.Email == email);
         Assert.NotNull(registration);
     }
 
