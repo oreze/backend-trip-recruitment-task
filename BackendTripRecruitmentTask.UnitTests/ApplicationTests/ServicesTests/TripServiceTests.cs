@@ -114,7 +114,7 @@ public class TripServiceTests
             DateTime.UtcNow.AddDays(1),
             100,
             "Poland");
-        
+
         var existingCountry = (Country?)Activator.CreateInstance(typeof(Country), true);
         PropertyHelper.SetProperty(existingCountry, nameof(existingCountry.Name), "Poland");
         var countries = new List<Country> { existingCountry! };
@@ -139,7 +139,7 @@ public class TripServiceTests
             DateTime.UtcNow.AddDays(1),
             100,
             "Poland");
-        
+
         var existingCountry = (Country?)Activator.CreateInstance(typeof(Country), true);
         PropertyHelper.SetProperty(existingCountry, nameof(existingCountry.Name), "Poland");
         var countries = new List<Country> { existingCountry! };
@@ -152,7 +152,7 @@ public class TripServiceTests
         var trips = new List<Trip> { trip! };
         _mockDbContext.Setup(db => db.Trips)
             .ReturnsDbSet(trips);
-        
+
         await _tripService.EditTrip(1, editTripDto);
         Assert.Equal(editTripDto.Name, trip!.Name);
         Assert.Equal(editTripDto.Description, trip.Description);
@@ -160,7 +160,7 @@ public class TripServiceTests
         Assert.Equal(editTripDto.NumberOfSeats, trip.NumberOfSeats);
         _mockDbContext.Verify();
     }
-    
+
     [Fact]
     public async Task EditTrip_TripWithNameExists_ThrowsInputException()
     {
@@ -174,11 +174,11 @@ public class TripServiceTests
         var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
         PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
         PropertyHelper.SetProperty(trip, nameof(Trip.Name), "Existing Trip Name");
-        
+
         var tripWithDifferentName = (Trip?)Activator.CreateInstance(typeof(Trip), true);
         PropertyHelper.SetProperty(tripWithDifferentName, nameof(Trip.ID), 2);
         PropertyHelper.SetProperty(tripWithDifferentName, nameof(Trip.Name), "Trip2");
-        
+
         var trips = new List<Trip> { trip!, tripWithDifferentName! };
         _mockDbContext.Setup(db => db.Trips)
             .ReturnsDbSet(trips);
