@@ -311,24 +311,24 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task DeleteTrip_TripExists_ReturnsOk()
     {
-        var createTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
+        
+        await _dbContext.AddAsync(trip);
+        await _dbContext.SaveChangesAsync();
 
-        var createTripJson = JsonSerializer.Serialize(createTripDto);
-        var createTripContent = new StringContent(createTripJson, Encoding.UTF8, "application/json");
-        var createTripResponse = await _httpClient.PostAsync("/trips", createTripContent);
-        createTripResponse.EnsureSuccessStatusCode();
-        var tripID = await createTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
-
-        var deleteTripResponse = await _httpClient.DeleteAsync($"/trips/{tripID}");
+        var deleteTripResponse = await _httpClient.DeleteAsync($"/trips/{trip.ID}");
 
         deleteTripResponse.EnsureSuccessStatusCode();
-        var deletedTrip = await _dbContext.Trips.FindAsync(tripID);
+        var wasDeleted = await deleteTripResponse.Content.ReadFromJsonAsync<bool>();
+        Assert.True(wasDeleted);
+
+        var deletedTrip = await _dbContext.Trips.FirstOrDefaultAsync(x => x.ID == trip.ID);
         Assert.Null(deletedTrip);
     }
 
