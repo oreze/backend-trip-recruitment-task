@@ -533,26 +533,21 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task RegisterForTrip_InvalidEmail_ReturnsBadRequest()
     {
-        var firstTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
 
-        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
-        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
-        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
-        firstTripResponse.EnsureSuccessStatusCode();
-        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
+        await _dbContext.Trips.AddAsync(trip);
+        await _dbContext.SaveChangesAsync();
 
         var email = "invalid-email";
 
-        // Act
-        var response = await _httpClient.PostAsync($"/trips/{tripID}/register?email={email}", null);
+        var response = await _httpClient.PostAsync($"/trips/{trip.ID}/register?email={email}", null);
 
-        // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
