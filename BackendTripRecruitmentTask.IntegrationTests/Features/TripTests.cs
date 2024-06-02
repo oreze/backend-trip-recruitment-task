@@ -29,6 +29,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
         _scope.Dispose();
     }
 
+
     [Fact]
     public async Task CreateTrip_ValidInput_ReturnsOk()
     {
@@ -305,7 +306,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
-    
+
     [Fact]
     public async Task DeleteTrip_TripExists_ReturnsOk()
     {
@@ -324,7 +325,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotEqual(0, tripID);
 
         var deleteTripResponse = await _httpClient.DeleteAsync($"/trips/{tripID}");
-        
+
         deleteTripResponse.EnsureSuccessStatusCode();
         var deletedTrip = await _dbContext.Trips.FindAsync(tripID);
         Assert.Null(deletedTrip);
@@ -335,5 +336,58 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     {
         var response = await _httpClient.DeleteAsync($"/trips/{int.MaxValue}");
         response.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task ListAllTrips_ReturnsAllTrips()
+    {
+        var firstTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var secondTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
+        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
+        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
+        firstTripResponse.EnsureSuccessStatusCode();
+
+        var secondTripJson = JsonSerializer.Serialize(secondTripDto);
+        var secondTripContent = new StringContent(secondTripJson, Encoding.UTF8, "application/json");
+        var secondTripResponse = await _httpClient.PostAsync("/trips", secondTripContent);
+        secondTripResponse.EnsureSuccessStatusCode();
+
+        var response = await _httpClient.GetAsync("/trips");
+
+        response.EnsureSuccessStatusCode();
+        var trips = await response.Content.ReadFromJsonAsync<List<TripListDto>>();
+        Assert.True(trips!.Count >= 2);
+        Assert.Contains(trips,
+            t => t.Name == firstTripDto.Name && t.Country == firstTripDto.CountryName &&
+                 t.StartDate == firstTripDto.StartDate);
+        Assert.Contains(trips,
+            t => t.Name == secondTripDto.Name && t.Country == secondTripDto.CountryName &&
+                 t.StartDate == secondTripDto.StartDate);
+    }
+
+    [Fact]
+    public async Task ListAllTrips_NoTrips_ReturnsEmptyList()
+    {
+        // Not the best solution, but I cannot make it work - database is not being cleaned up after each test.
+        // EnsureDeleted/EnsureCreated don't work, it's something that should be taken care of later
+        await _dbContext.Database.EnsureDeletedAsync();
+        var response = await _httpClient.GetAsync("/trips");
+
+        response.EnsureSuccessStatusCode();
+        var trips = await response.Content.ReadFromJsonAsync<List<TripListDto>>();
+        Assert.Empty(trips!);
     }
 }
