@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - backend-trip-recruitment-task
+name: Production CI/CD for backend-trip-recruitment-task with deploy on Azure Web Apps
 
 on:
   push:
@@ -22,8 +22,16 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
+      - name: Restore dependencies
+        run: dotnet restore
+
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: |
+          dotnet test -c Release --no-build --verbosity normal BackendTripRecruitmentTask.UnitTests
+          dotnet test -c Release --no-build --verbosity normal BackendTripRecruitmentTask.IntegrationTests
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
@@ -63,4 +71,3 @@ jobs:
           app-name: 'backend-trip-recruitment-task'
           slot-name: 'Production'
           package: .
-          
