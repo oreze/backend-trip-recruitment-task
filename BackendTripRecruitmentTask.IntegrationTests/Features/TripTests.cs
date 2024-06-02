@@ -64,33 +64,29 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task CreateTrip_TripWithNameExists_ReturnsBadRequest()
     {
-        var randomTripName = Guid.NewGuid().ToString();
-        var createTripDto = new CreateTripDto(
-            randomTripName,
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var firstTrip = Trip.Create(
+            Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
+        
+        await _dbContext.Trips.AddAsync(firstTrip);
+        await _dbContext.SaveChangesAsync();
 
         var createTripWithSameNameDto = new CreateTripDto(
-            randomTripName,
+            firstTrip.Name,
             "Random description2",
             DateTime.UtcNow.AddDays(5),
             10,
             "Poland");
 
-        var json = JsonSerializer.Serialize(createTripDto);
+        var json = JsonSerializer.Serialize(createTripWithSameNameDto);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-
         var response = await _httpClient.PostAsync("/trips", content);
 
-        response.EnsureSuccessStatusCode();
-
-        var secondTripJson = JsonSerializer.Serialize(createTripWithSameNameDto);
-        var secondTripContent = new StringContent(secondTripJson, Encoding.UTF8, "application/json");
-        var secondTripResponse = await _httpClient.PostAsync("/trips", secondTripContent);
-
-        Assert.Equal(HttpStatusCode.BadRequest, secondTripResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
