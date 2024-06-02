@@ -395,43 +395,35 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task SearchTripsByCountry_ReturnsTripsForCountry()
     {
-        var firstTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var firstTrip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
-
-        var secondTripDto = new CreateTripDto(
+            country);
+        
+        var secondTrip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
 
-        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
-        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
-        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
-        firstTripResponse.EnsureSuccessStatusCode();
-
-        var secondTripJson = JsonSerializer.Serialize(secondTripDto);
-        var secondTripContent = new StringContent(secondTripJson, Encoding.UTF8, "application/json");
-        var secondTripResponse = await _httpClient.PostAsync("/trips", secondTripContent);
-        secondTripResponse.EnsureSuccessStatusCode();
-
-        // Act
+        await _dbContext.AddRangeAsync([firstTrip, secondTrip]);
+        await _dbContext.SaveChangesAsync();
+        
         var response = await _httpClient.GetAsync("/trips/country/Poland");
 
-        // Assert
         response.EnsureSuccessStatusCode();
         var trips = await response.Content.ReadFromJsonAsync<List<TripSearchDto>>();
         Assert.True(trips!.Count >= 2);
         Assert.Contains(trips,
-            t => t.Name == firstTripDto.Name && t.Country == firstTripDto.CountryName &&
-                 t.StartDate == firstTripDto.StartDate);
+            t => t.Name == firstTrip.Name && t.Country == firstTrip.Country.Name &&
+                 t.StartDate == firstTrip.StartDate);
         Assert.Contains(trips,
-            t => t.Name == secondTripDto.Name && t.Country == secondTripDto.CountryName &&
-                 t.StartDate == secondTripDto.StartDate);
+            t => t.Name == secondTrip.Name && t.Country == secondTrip.Country.Name &&
+                 t.StartDate == secondTrip.StartDate);
     }
 
     [Fact]
