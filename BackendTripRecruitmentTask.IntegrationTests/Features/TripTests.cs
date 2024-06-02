@@ -53,11 +53,11 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             .Include(x => x.Country)
             .FirstOrDefaultAsync(x => x.ID == result);
         Assert.NotNull(trip);
-        Assert.Equal(createTripDto.Name, trip!.Name);
-        Assert.Equal(createTripDto.Description, trip!.Description);
-        Assert.Equal(createTripDto.CountryName, trip!.Country.Name);
-        Assert.Equal(createTripDto.NumberOfSeats, trip!.NumberOfSeats);
-        Assert.Equal(createTripDto.StartDate, trip!.StartDate);
+        Assert.Equal(createTripDto.Name, trip.Name);
+        Assert.Equal(createTripDto.Description, trip.Description);
+        Assert.Equal(createTripDto.CountryName, trip.Country.Name);
+        Assert.Equal(createTripDto.NumberOfSeats, trip.NumberOfSeats);
+        Assert.Equal(createTripDto.StartDate, trip.StartDate);
     }
 
     [Fact]
@@ -209,8 +209,8 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             "Germany");
 
         var editTripJson = JsonSerializer.Serialize(editTripDto);
-        var editTripContnet = new StringContent(editTripJson, Encoding.UTF8, "application/json");
-        var editTripResponse = await _httpClient.PutAsync($"/trips/{firstTrip.ID}", editTripContnet);
+        var editTripContent = new StringContent(editTripJson, Encoding.UTF8, "application/json");
+        var editTripResponse = await _httpClient.PutAsync($"/trips/{firstTrip.ID}", editTripContent);
         Assert.Equal(HttpStatusCode.BadRequest, editTripResponse.StatusCode);
 
         var updatedTrip = await _dbContext.Trips.Include(x => x.Country).FirstOrDefaultAsync(x => x.ID == firstTrip.ID);
