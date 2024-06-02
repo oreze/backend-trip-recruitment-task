@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendTripRecruitmentTask.IntegrationTests.Features;
 
+//TODO: Refactor, use dbcontext instead of controller actions for seeding/validating
 public class TripTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly TripDbContext _dbContext;
