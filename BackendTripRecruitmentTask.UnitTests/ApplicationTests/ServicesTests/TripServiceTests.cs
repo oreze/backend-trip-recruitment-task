@@ -113,7 +113,13 @@ public class TripServiceTests
             "New Trip Description",
             DateTime.UtcNow.AddDays(1),
             100,
-            null);
+            "Poland");
+        
+        var existingCountry = (Country?)Activator.CreateInstance(typeof(Country), true);
+        PropertyHelper.SetProperty(existingCountry, nameof(existingCountry.Name), "Poland");
+        var countries = new List<Country> { existingCountry! };
+        _mockDbContext.Setup(db => db.Countries)
+            .ReturnsDbSet(countries);
 
         var trips = Enumerable.Empty<Trip>();
         _mockDbContext.Setup(db => db.Trips)
@@ -125,10 +131,41 @@ public class TripServiceTests
     }
 
     [Fact]
-    public async Task EditTrip_TripWithNameExists_ThrowsInputException()
+    public async Task EditTrip_CanSetTheSameName_UpdateTrip()
     {
         var editTripDto = new EditTripDto(
             "Existing Trip Name",
+            "New Trip Description",
+            DateTime.UtcNow.AddDays(1),
+            100,
+            "Poland");
+        
+        var existingCountry = (Country?)Activator.CreateInstance(typeof(Country), true);
+        PropertyHelper.SetProperty(existingCountry, nameof(existingCountry.Name), "Poland");
+        var countries = new List<Country> { existingCountry! };
+        _mockDbContext.Setup(db => db.Countries)
+            .ReturnsDbSet(countries);
+
+        var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+        PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
+        PropertyHelper.SetProperty(trip, nameof(Trip.Name), "Existing Trip Name");
+        var trips = new List<Trip> { trip! };
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+        
+        await _tripService.EditTrip(1, editTripDto);
+        Assert.Equal(editTripDto.Name, trip!.Name);
+        Assert.Equal(editTripDto.Description, trip.Description);
+        Assert.Equal(editTripDto.StartDate, trip.StartDate);
+        Assert.Equal(editTripDto.NumberOfSeats, trip.NumberOfSeats);
+        _mockDbContext.Verify();
+    }
+    
+    [Fact]
+    public async Task EditTrip_TripWithNameExists_ThrowsInputException()
+    {
+        var editTripDto = new EditTripDto(
+            "Trip2",
             "New Trip Description",
             DateTime.UtcNow.AddDays(1),
             100,
@@ -137,7 +174,12 @@ public class TripServiceTests
         var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
         PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
         PropertyHelper.SetProperty(trip, nameof(Trip.Name), "Existing Trip Name");
-        var trips = new List<Trip> { trip! };
+        
+        var tripWithDifferentName = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+        PropertyHelper.SetProperty(tripWithDifferentName, nameof(Trip.ID), 2);
+        PropertyHelper.SetProperty(tripWithDifferentName, nameof(Trip.Name), "Trip2");
+        
+        var trips = new List<Trip> { trip!, tripWithDifferentName! };
         _mockDbContext.Setup(db => db.Trips)
             .ReturnsDbSet(trips);
 

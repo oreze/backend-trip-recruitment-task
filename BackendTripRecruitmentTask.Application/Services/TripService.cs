@@ -47,7 +47,7 @@ public class TripService(TripDbContext dbContext) : ITripService
             throw new NotFoundException($"Could not find trip with ID {id}.");
 
         var doesTripWithNameExists = editTripDto.Name != null && await _dbContext.Trips.AnyAsync(x =>
-            x.Name.Equals(editTripDto.Name, StringComparison.InvariantCultureIgnoreCase));
+            x.Name.Equals(editTripDto.Name, StringComparison.InvariantCultureIgnoreCase) && x.ID != id);
 
         if (doesTripWithNameExists)
             throw new InputException(nameof(editTripDto.Name),

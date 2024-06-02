@@ -193,6 +193,13 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50, 
             "Poland");
+        
+        var createTripWithDifferentNameDto = new CreateTripDto(
+            tripName + "1",
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50, 
+            "Poland");
 
         var editTripDto = new EditTripDto(
             Name: tripName,
@@ -207,6 +214,11 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
         createTripResponse.EnsureSuccessStatusCode();
         var tripID = await createTripResponse.Content.ReadFromJsonAsync<int>();
         Assert.NotEqual(0, tripID);
+        
+        var createTripWithDifferentNameJson = JsonSerializer.Serialize(createTripWithDifferentNameDto);
+        var createTripWithDifferentNameContent = new StringContent(createTripWithDifferentNameJson, Encoding.UTF8, "application/json");
+        var createTripWithDifferentNameResponse = await _httpClient.PostAsync($"/trips", createTripWithDifferentNameContent);
+        createTripResponse.EnsureSuccessStatusCode();
 
         var editTripJson = JsonSerializer.Serialize(editTripDto);
         var editTripContnet = new StringContent(editTripJson, Encoding.UTF8, "application/json");
