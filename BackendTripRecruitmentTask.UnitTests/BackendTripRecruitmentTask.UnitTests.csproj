@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BackendTripRecruitmentTask.API\BackendTripRecruitmentTask.API.csproj" />
+        <ProjectReference Include="..\BackendTripRecruitmentTask.API\BackendTripRecruitmentTask.API.csproj"/>
         <ProjectReference Include="..\BackendTripRecruitmentTask.Application\BackendTripRecruitmentTask.Application.csproj"/>
         <ProjectReference Include="..\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj"/>
         <ProjectReference Include="..\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj"/>

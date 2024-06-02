@@ -275,7 +275,7 @@ public class TripServiceTests
         Assert.True(result);
         _mockDbContext.Verify(
             db => db.RemoveRange(It.Is<IEnumerable<Registration>>(r => r.SequenceEqual(registrations))), Times.Once);
-        _mockDbContext.Verify(db => db.Remove(It.Is<Trip>(t => t.ID == trip.ID)), Times.Once);
+        _mockDbContext.Verify(db => db.Remove(It.Is<Trip>(t => t.ID == trip!.ID)), Times.Once);
         _mockDbContext.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
