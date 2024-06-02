@@ -180,7 +180,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
         var json = JsonSerializer.Serialize(editTripDto);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PutAsync("/trips/999", content);
+        var response = await _httpClient.PutAsync($"/trips/{int.MaxValue}", content);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
