@@ -9,6 +9,10 @@ using Moq.EntityFrameworkCore;
 
 namespace BackendTripRecruitmentTask.UnitTests.ApplicationTests.ServicesTests;
 
+/// <summary>
+/// These tests are not entirely units, but I want to keep them here as a demonstration of how this service could be tested.
+/// However this logic should be tested in IntegrationTests project
+/// </summary>
 public class TripServiceTests
 {
     private readonly Mock<TripDbContext> _mockDbContext;
