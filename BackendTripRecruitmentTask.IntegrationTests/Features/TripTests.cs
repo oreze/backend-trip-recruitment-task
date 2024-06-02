@@ -337,6 +337,8 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     {
         var response = await _httpClient.DeleteAsync($"/trips/{int.MaxValue}");
         response.EnsureSuccessStatusCode();
+        var wasDeleted = await response.Content.ReadFromJsonAsync<bool>();
+        Assert.False(wasDeleted);
     }
 
     [Fact]
