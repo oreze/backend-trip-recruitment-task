@@ -278,4 +278,91 @@ public class TripServiceTests
         _mockDbContext.Verify(db => db.Remove(It.Is<Trip>(t => t.ID == trip.ID)), Times.Once);
         _mockDbContext.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task GetAll_ReturnsAllTrips()
+    {
+        var trips = new List<Trip>();
+        for (var i = 1; i < 11; i++)
+        {
+            var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+            PropertyHelper.SetProperty(trip, nameof(Trip.ID), i);
+        }
+
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var result = await _tripService.GetAll();
+
+        Assert.Equal(trips.Count, result.Count());
+        for (var i = 0; i < trips.Count; i++)
+        {
+            var trip = trips[i];
+            Assert.Equal(trip.ID, ++i);
+        }
+    }
+
+    [Fact]
+    public async Task GetAll_NoTrips_ReturnsEmptyList()
+    {
+        var trips = Enumerable.Empty<Trip>();
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var result = await _tripService.GetAll();
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetByCountry_ReturnsTripsForCountry()
+    {
+        var poland = (Country?)Activator.CreateInstance(typeof(Country), true);
+        var england = (Country?)Activator.CreateInstance(typeof(Country), true);
+        PropertyHelper.SetProperty(poland, nameof(Country.Name), "Poland");
+        PropertyHelper.SetProperty(england, nameof(Country.Name), "England");
+        var countries = new List<Country> { poland!, england! };
+        _mockDbContext.Setup(db => db.Countries)
+            .ReturnsDbSet(countries);
+
+        var trips = new List<Trip>();
+        for (var i = 1; i < 11; i++)
+        {
+            var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+            PropertyHelper.SetProperty(trip, nameof(Trip.ID), i);
+            PropertyHelper.SetProperty(trip, nameof(Trip.Country), i % 2 == 0 ? poland! : england!);
+            trips.Add(trip!);
+        }
+
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var result = (await _tripService.GetByCountry(poland!.Name)).ToList();
+
+        Assert.Equal(5, result.Count());
+        Assert.True(result.All(x => x.Country == poland.Name));
+    }
+
+    [Fact]
+    public async Task GetByCountry_NoTripsForCountry_ReturnsEmptyList()
+    {
+        var poland = (Country?)Activator.CreateInstance(typeof(Country), true);
+        PropertyHelper.SetProperty(poland, nameof(Country.Name), "Poland");
+
+        var trips = new List<Trip>();
+        for (var i = 1; i < 11; i++)
+        {
+            var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+            PropertyHelper.SetProperty(trip, nameof(Trip.ID), i);
+            PropertyHelper.SetProperty(trip, nameof(Trip.Country), poland!);
+            trips.Add(trip!);
+        }
+
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var result = await _tripService.GetByCountry("England");
+
+        Assert.Empty(result);
+    }
 }

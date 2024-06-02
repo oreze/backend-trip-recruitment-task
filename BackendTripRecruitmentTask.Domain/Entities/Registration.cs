@@ -13,7 +13,8 @@ public class Registration
     public string Email { get; private set; } = null!;
     public DateTime RegisteredAt { get; private set; }
 
-    public int TripID { get; }
+    // ReSharper disable once UnusedAutoPropertyAccessor.Local
+    public int TripID { get; private set; }
     public Trip Trip { get; private set; } = null!;
 
     public static Registration Create(string email, Trip trip)

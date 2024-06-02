@@ -149,4 +149,6 @@ public class TripService(TripDbContext dbContext) : ITripService
         await _dbContext.Registrations.AddAsync(registration);
         await _dbContext.SaveChangesAsync();
     }
+
+    //TODO write tests for Register and GetDetails method
 }
