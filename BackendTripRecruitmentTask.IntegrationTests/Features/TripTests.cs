@@ -273,12 +273,22 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task EditTrip_NumberOfSeatsLowerThanRegisteredUsers_ReturnsBadRequest()
     {
-        var createTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
+        
+        await _dbContext.Trips.AddAsync(trip);
+
+        for (var i = 0; i < 5; i++)
+        {
+            var registration = Registration.Create("test{i}@test.com", trip);
+            await _dbContext.Registrations.AddAsync(registration);
+        }
+        await _dbContext.SaveChangesAsync();
 
         var editTripDto = new EditTripDto(
             Guid.NewGuid().ToString(),
@@ -287,23 +297,9 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             1,
             "Germany");
 
-        var createTripJson = JsonSerializer.Serialize(createTripDto);
-        var createTripContent = new StringContent(createTripJson, Encoding.UTF8, "application/json");
-        var createTripResponse = await _httpClient.PostAsync("/trips", createTripContent);
-        createTripResponse.EnsureSuccessStatusCode();
-        var tripID = await createTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
-
-        for (var i = 0; i < 5; i++)
-        {
-            var registerForTripResponse =
-                await _httpClient.PostAsync($"/trips/{tripID}/register?email=test{i}@test.com", null);
-            registerForTripResponse.EnsureSuccessStatusCode();
-        }
-
         var json = JsonSerializer.Serialize(editTripDto);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"/trips/{tripID}", content);
+        var response = await _httpClient.PutAsync($"/trips/{trip.ID}", content);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
