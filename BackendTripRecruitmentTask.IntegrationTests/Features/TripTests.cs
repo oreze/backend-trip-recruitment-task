@@ -31,7 +31,6 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
         _scope.Dispose();
     }
 
-
     [Fact]
     public async Task CreateTrip_ValidInput_ReturnsOk()
     {
@@ -560,32 +559,24 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task RegisterForTrip_EmailAlreadyRegistered_ReturnsBadRequest()
     {
-        var firstTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
 
-        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
-        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
-        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
-        firstTripResponse.EnsureSuccessStatusCode();
-        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
+        await _dbContext.Trips.AddAsync(trip);
+        
+        const string email = "test@example.com";
 
-        var email = "test@example.com";
-
-
-        var trip = await _dbContext.Trips.FirstOrDefaultAsync(r => r.ID == tripID);
-        var registration = Registration.Create(email, trip!);
+        var registration = Registration.Create(email, trip);
         _dbContext.Registrations.Add(registration);
         await _dbContext.SaveChangesAsync();
 
-        // Act
         var response = await _httpClient.PostAsync($"/trips/{trip.ID}/register?email={email}", null);
 
-        // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }
