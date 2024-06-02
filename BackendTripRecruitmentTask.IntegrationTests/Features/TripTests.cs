@@ -305,4 +305,35 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
+    
+    [Fact]
+    public async Task DeleteTrip_TripExists_ReturnsOk()
+    {
+        var createTripDto = new CreateTripDto(
+            Guid.NewGuid().ToString(),
+            "Random description",
+            DateTime.UtcNow.AddDays(10),
+            50,
+            "Poland");
+
+        var createTripJson = JsonSerializer.Serialize(createTripDto);
+        var createTripContent = new StringContent(createTripJson, Encoding.UTF8, "application/json");
+        var createTripResponse = await _httpClient.PostAsync("/trips", createTripContent);
+        createTripResponse.EnsureSuccessStatusCode();
+        var tripID = await createTripResponse.Content.ReadFromJsonAsync<int>();
+        Assert.NotEqual(0, tripID);
+
+        var deleteTripResponse = await _httpClient.DeleteAsync($"/trips/{tripID}");
+        
+        deleteTripResponse.EnsureSuccessStatusCode();
+        var deletedTrip = await _dbContext.Trips.FindAsync(tripID);
+        Assert.Null(deletedTrip);
+    }
+
+    [Fact]
+    public async Task DeleteTrip_TripDoesNotExist_ReturnsNotFound()
+    {
+        var response = await _httpClient.DeleteAsync($"/trips/{int.MaxValue}");
+        response.EnsureSuccessStatusCode();
+    }
 }
