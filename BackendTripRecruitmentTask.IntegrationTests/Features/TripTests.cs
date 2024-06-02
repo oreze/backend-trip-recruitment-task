@@ -132,12 +132,16 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task EditTrip_ValidInput_ReturnsOk()
     {
-        var createTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
+        
+        await _dbContext.Trips.AddAsync(trip);
+        await _dbContext.SaveChangesAsync();
 
         var editTripDto = new EditTripDto(
             Guid.NewGuid().ToString(),
@@ -146,19 +150,14 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             100,
             "Germany");
 
-        var createTripJson = JsonSerializer.Serialize(createTripDto);
-        var createTripContent = new StringContent(createTripJson, Encoding.UTF8, "application/json");
-        var createTripResponse = await _httpClient.PostAsync("/trips", createTripContent);
-        createTripResponse.EnsureSuccessStatusCode();
-        var tripID = await createTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
-
         var editTripJson = JsonSerializer.Serialize(editTripDto);
-        var editTripContnet = new StringContent(editTripJson, Encoding.UTF8, "application/json");
-        var editTripResponse = await _httpClient.PutAsync($"/trips/{tripID}", editTripContnet);
+        var editTripContent = new StringContent(editTripJson, Encoding.UTF8, "application/json");
+        var editTripResponse = await _httpClient.PutAsync($"/trips/{trip.ID}", editTripContent);
         editTripResponse.EnsureSuccessStatusCode();
 
-        var updatedTrip = await _dbContext.Trips.Include(x => x.Country).FirstOrDefaultAsync(x => x.ID == tripID);
+        // Context must be reloaded after the update as controller and tests have different instances
+        await _dbContext.Entry(trip).ReloadAsync();
+        var updatedTrip = await _dbContext.Trips.Include(x => x.Country).FirstOrDefaultAsync(x => x.ID == trip.ID);
         Assert.NotNull(updatedTrip);
         Assert.Equal(editTripDto.Name, updatedTrip.Name);
         Assert.Equal(editTripDto.Description, updatedTrip.Description);
