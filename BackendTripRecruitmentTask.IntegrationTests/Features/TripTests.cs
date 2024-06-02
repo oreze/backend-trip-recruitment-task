@@ -451,37 +451,33 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task GetSingleTrip_TripExists_ReturnsTrip()
     {
-        var firstTripDto = new CreateTripDto(
+        var country = _dbContext.Countries.First(x => x.ThreeLetterCode == "POL");
+        var trip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
             DateTime.UtcNow.AddDays(10),
             50,
-            "Poland");
+            country);
 
-        var firstTripJson = JsonSerializer.Serialize(firstTripDto);
-        var firstTripContent = new StringContent(firstTripJson, Encoding.UTF8, "application/json");
-        var firstTripResponse = await _httpClient.PostAsync("/trips", firstTripContent);
-        firstTripResponse.EnsureSuccessStatusCode();
-        var tripID = await firstTripResponse.Content.ReadFromJsonAsync<int>();
-        Assert.NotEqual(0, tripID);
+        await _dbContext.Trips.AddAsync(trip);
 
         for (var i = 0; i < 5; i++)
         {
-            var registerForTripResponse =
-                await _httpClient.PostAsync($"/trips/{tripID}/register?email=test{i}@test.com", null);
-            registerForTripResponse.EnsureSuccessStatusCode();
+            var registration = Registration.Create("test{i}@test.com", trip);
+            await _dbContext.Registrations.AddAsync(registration);
         }
+        await _dbContext.SaveChangesAsync();
 
-        var response = await _httpClient.GetAsync($"/trips/{tripID}");
+        var response = await _httpClient.GetAsync($"/trips/{trip.ID}");
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<TripDetailsDto>();
         Assert.NotNull(result);
-        Assert.Equal(firstTripDto.Name, result.Name);
-        Assert.Equal(firstTripDto.Description, result.Description);
-        Assert.Equal(firstTripDto.StartDate, result.StartDate);
-        Assert.Equal(firstTripDto.NumberOfSeats, result.NumberOfSeats);
-        Assert.Equal(firstTripDto.CountryName, result.Country);
+        Assert.Equal(trip.Name, result.Name);
+        Assert.Equal(trip.Description, result.Description);
+        Assert.Equal(trip.StartDate, result.StartDate);
+        Assert.Equal(trip.NumberOfSeats, result.NumberOfSeats);
+        Assert.Equal(trip.Country.Name, result.Country);
         Assert.Equal(5, result.RegistrationDetails.Count());
     }
 
