@@ -8,6 +8,9 @@ using ILogger = Serilog.ILogger;
 
 namespace BackendTripRecruitmentTask.API.Middlewares;
 
+/// <summary>
+///     Middleware for handling custom exceptions. Transform exceptions into status codes returned by API.
+/// </summary>
 public class CustomExceptionHandlerMiddleware(RequestDelegate next)
 {
     private const string InternalServerErrorMessage =
@@ -15,7 +18,9 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate next)
 
     private static readonly ILogger Logger = Log.ForContext<CustomExceptionHandlerMiddleware>();
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public async Task Invoke(HttpContext context)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
         try
         {

@@ -70,7 +70,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         await _dbContext.Trips.AddAsync(firstTrip);
         await _dbContext.SaveChangesAsync();
 
@@ -134,7 +134,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         await _dbContext.Trips.AddAsync(trip);
         await _dbContext.SaveChangesAsync();
 
@@ -190,7 +190,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         var secondTrip = Trip.Create(
             tripName + "1",
             "Random description",
@@ -233,7 +233,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         await _dbContext.Trips.AddAsync(trip);
         await _dbContext.SaveChangesAsync();
 
@@ -261,7 +261,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         await _dbContext.Trips.AddAsync(trip);
 
         for (var i = 0; i < 5; i++)
@@ -269,6 +269,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             var registration = Registration.Create("test{i}@test.com", trip);
             await _dbContext.Registrations.AddAsync(registration);
         }
+
         await _dbContext.SaveChangesAsync();
 
         var editTripDto = new EditTripDto(
@@ -295,7 +296,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         await _dbContext.AddAsync(trip);
         await _dbContext.SaveChangesAsync();
 
@@ -328,7 +329,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         var secondTrip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
@@ -375,7 +376,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             DateTime.UtcNow.AddDays(10),
             50,
             country);
-        
+
         var secondTrip = Trip.Create(
             Guid.NewGuid().ToString(),
             "Random description",
@@ -385,7 +386,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
 
         await _dbContext.AddRangeAsync([firstTrip, secondTrip]);
         await _dbContext.SaveChangesAsync();
-        
+
         var response = await _httpClient.GetAsync("/trips/country/Poland");
 
         response.EnsureSuccessStatusCode();
@@ -431,6 +432,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             var registration = Registration.Create("test{i}@test.com", trip);
             await _dbContext.Registrations.AddAsync(registration);
         }
+
         await _dbContext.SaveChangesAsync();
 
         var response = await _httpClient.GetAsync($"/trips/{trip.ID}");
@@ -521,7 +523,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
             country);
 
         await _dbContext.Trips.AddAsync(trip);
-        
+
         const string email = "test@example.com";
 
         var registration = Registration.Create(email, trip);

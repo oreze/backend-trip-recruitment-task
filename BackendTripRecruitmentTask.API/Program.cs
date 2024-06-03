@@ -4,7 +4,6 @@ using BackendTripRecruitmentTask.Application.Services;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using BackendTripRecruitmentTask.Infrastructure.Seeders;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
