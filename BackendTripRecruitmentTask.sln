@@ -1,16 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.API", ".\BackendTripRecruitmentTask.API\BackendTripRecruitmentTask.API.csproj", "{6695CC8C-B9A9-488F-BF70-19619DE2C155}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.API", ".\src\BackendTripRecruitmentTask.API\BackendTripRecruitmentTask.API.csproj", "{6695CC8C-B9A9-488F-BF70-19619DE2C155}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Application", ".\BackendTripRecruitmentTask.Application\BackendTripRecruitmentTask.Application.csproj", "{A249FEF7-C15C-4885-9D7D-1E7903E69C53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Application", ".\src\BackendTripRecruitmentTask.Application\BackendTripRecruitmentTask.Application.csproj", "{A249FEF7-C15C-4885-9D7D-1E7903E69C53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Domain", ".\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj", "{C79B14E2-412B-4ED1-8D1B-ABA04B81685C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Domain", ".\src\BackendTripRecruitmentTask.Domain\BackendTripRecruitmentTask.Domain.csproj", "{C79B14E2-412B-4ED1-8D1B-ABA04B81685C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Infrastructure", ".\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj", "{0E435919-4596-430F-A0B6-7E79A4CE5C6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.Infrastructure", ".\src\BackendTripRecruitmentTask.Infrastructure\BackendTripRecruitmentTask.Infrastructure.csproj", "{0E435919-4596-430F-A0B6-7E79A4CE5C6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.UnitTests", ".\BackendTripRecruitmentTask.UnitTests\BackendTripRecruitmentTask.UnitTests.csproj", "{69F9F4ED-D287-48CC-9E5C-746C4C3B55B9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.UnitTests", ".\src\BackendTripRecruitmentTask.UnitTests\BackendTripRecruitmentTask.UnitTests.csproj", "{69F9F4ED-D287-48CC-9E5C-746C4C3B55B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.IntegrationTests", ".\BackendTripRecruitmentTask.IntegrationTests\BackendTripRecruitmentTask.IntegrationTests.csproj", "{98E49508-3E45-493C-8DD9-049E8CD00680}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTripRecruitmentTask.IntegrationTests", ".\src\BackendTripRecruitmentTask.IntegrationTests\BackendTripRecruitmentTask.IntegrationTests.csproj", "{98E49508-3E45-493C-8DD9-049E8CD00680}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
