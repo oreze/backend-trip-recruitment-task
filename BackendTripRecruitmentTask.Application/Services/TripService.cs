@@ -118,7 +118,7 @@ public class TripService(TripDbContext dbContext) : ITripService
             .SingleOrDefaultAsync(x => x.ID == id);
 
         if (trip == default)
-            throw new NotFoundException("Could not find trip with ID {id}.");
+            throw new NotFoundException($"Could not find trip with ID {id}.");
 
         var registrationsForTrip = trip.Registrations
             .Select(x => new RegistrationDetailsDto(x.Email, x.RegisteredAt));

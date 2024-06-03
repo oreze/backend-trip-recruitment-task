@@ -11,8 +11,8 @@ namespace BackendTripRecruitmentTask.UnitTests.ApplicationTests.ServicesTests;
 
 /// <summary>
 ///     These tests are not entirely units, but I want to keep them here as a demonstration of how this service could be
-///     tested.
-///     However this logic should be tested in IntegrationTests project
+///     tested. 
+///     This logic is also tested in IntegrationTests project
 /// </summary>
 public class TripServiceTests
 {
@@ -406,5 +406,63 @@ public class TripServiceTests
         var result = await _tripService.GetByCountry("England");
 
         Assert.Empty(result);
+    }
+    
+    [Fact]
+    public async Task GetDetails_TripDoesNotExist_ThrowsNotFoundException()
+    {
+        var trips = Enumerable.Empty<Trip>();
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(() => _tripService.GetDetails(1));
+        Assert.Equal("Could not find trip with ID 1.", exception.Message);
+        _mockDbContext.Verify();
+    }
+
+    [Fact]
+    public async Task GetDetails_TripExists_ReturnsTripDetailsDto()
+    {
+        var country = (Country?)Activator.CreateInstance(typeof(Country), true);
+        PropertyHelper.SetProperty(country, nameof(Country.Name), "Poland");
+
+        var registrations = new List<Registration>();
+        for (var i = 0; i < 10; i++)
+        {
+            var registration = (Registration?)Activator.CreateInstance(typeof(Registration), true);
+            PropertyHelper.SetProperty(registration, nameof(Registration.Email), $"user{i}@example.com");
+            PropertyHelper.SetProperty(registration, nameof(Registration.RegisteredAt), DateTime.UtcNow.AddDays(-i));
+            registrations.Add(registration!);
+        }
+
+        var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+        PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
+        PropertyHelper.SetProperty(trip, nameof(Trip.Name), "Trip1");
+        PropertyHelper.SetProperty(trip, nameof(Trip.Country), country!);
+        PropertyHelper.SetProperty(trip, nameof(Trip.Description), "This is a test trip.");
+        PropertyHelper.SetProperty(trip, nameof(Trip.StartDate), DateTime.UtcNow.AddDays(1));
+        PropertyHelper.SetProperty(trip, nameof(Trip.NumberOfSeats), 50);
+        PropertyHelper.SetProperty(trip, nameof(Trip.Registrations), registrations);
+
+        var trips = new List<Trip> { trip! };
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var result = await _tripService.GetDetails(1);
+
+        Assert.Equal(trip.Name, result.Name);
+        Assert.Equal(trip.Country.Name, result.Country);
+        Assert.Equal(trip.Description, result.Description);
+        Assert.Equal(trip.StartDate, result.StartDate);
+        Assert.Equal(trip.NumberOfSeats, result.NumberOfSeats);
+        Assert.Equal(trip.Registrations.Count, result.RegistrationDetails.Count());
+        for (var i = 0; i < trip.Registrations.Count; i++)
+        {
+            var registration = trip.Registrations[i];
+            var registrationDto = result.RegistrationDetails.ElementAt(i);
+            Assert.Equal(registration.Email, registrationDto.Email);
+            Assert.Equal(registration.RegisteredAt, registrationDto.RegisteredAt);
+        }
+        _mockDbContext.Verify();
     }
 }
