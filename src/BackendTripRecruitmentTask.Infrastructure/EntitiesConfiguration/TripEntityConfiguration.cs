@@ -1,3 +1,4 @@
+using BackendTripRecruitmentTask.Domain;
 using BackendTripRecruitmentTask.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,7 +11,7 @@ public class TripEntityConfiguration : IEntityTypeConfiguration<Trip>
     {
         builder.HasKey(i => i.ID);
 
-        builder.Property(i => i.Name).HasMaxLength(50).IsRequired();
+        builder.Property(i => i.Name).HasMaxLength(Constants.MaximumTripNameLength).IsRequired();
         builder.Property(i => i.Description);
         builder.Property(i => i.StartDate).IsRequired();
         builder.Property(i => i.NumberOfSeats).IsRequired();

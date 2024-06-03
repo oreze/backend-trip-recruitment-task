@@ -1,3 +1,4 @@
+using BackendTripRecruitmentTask.Domain;
 using BackendTripRecruitmentTask.Domain.Entities;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using BackendTripRecruitmentTask.Infrastructure.EntitiesConfiguration;
@@ -30,7 +31,7 @@ public class TripEntityConfigurationTests
 
         var nameProperty = entityType.FindProperty(nameof(Trip.Name));
         Assert.NotNull(nameProperty);
-        Assert.Equal(50, nameProperty.GetMaxLength());
+        Assert.Equal(Constants.MaximumTripNameLength, nameProperty.GetMaxLength());
         Assert.False(nameProperty.IsNullable);
         Assert.True(nameProperty.IsUniqueIndex());
 

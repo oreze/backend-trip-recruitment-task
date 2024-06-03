@@ -26,6 +26,7 @@ public class TripTests : IClassFixture<WebApplicationFactory<Program>>
 
     ~TripTests()
     {
+        _httpClient.Dispose();
         _dbContext.Dispose();
         _scope.Dispose();
     }

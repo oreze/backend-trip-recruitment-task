@@ -62,7 +62,7 @@ public class TripsController(IMediator mediator) : ControllerBase
     /// </summary>
     /// <param name="id">The ID of the trip to be deleted.</param>
     /// <returns>True if the trip is successfully deleted, false otherwise.</returns>
-    /// <response code="200">Returns no content if everything went okay.</response>
+    /// <response code="200">Returns true if trip was removed, false if not exists.</response>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTrip(int id)
     {

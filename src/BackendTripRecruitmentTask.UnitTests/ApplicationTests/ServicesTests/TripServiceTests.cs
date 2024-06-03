@@ -11,7 +11,7 @@ namespace BackendTripRecruitmentTask.UnitTests.ApplicationTests.ServicesTests;
 
 /// <summary>
 ///     These tests are not entirely units, but I want to keep them here as a demonstration of how this service could be
-///     tested. 
+///     tested.
 ///     This logic is also tested in IntegrationTests project
 /// </summary>
 public class TripServiceTests
@@ -407,7 +407,7 @@ public class TripServiceTests
 
         Assert.Empty(result);
     }
-    
+
     [Fact]
     public async Task GetDetails_TripDoesNotExist_ThrowsNotFoundException()
     {
@@ -463,9 +463,10 @@ public class TripServiceTests
             Assert.Equal(registration.Email, registrationDto.Email);
             Assert.Equal(registration.RegisteredAt, registrationDto.RegisteredAt);
         }
+
         _mockDbContext.Verify();
     }
-    
+
     [Fact]
     public async Task Register_TripDoesNotExist_ThrowsNotFoundException()
     {
@@ -497,8 +498,11 @@ public class TripServiceTests
         _mockDbContext.Setup(db => db.Trips)
             .ReturnsDbSet(trips);
 
-        var exception = await Assert.ThrowsAsync<TripRegistrationLimitExceededException>(() => _tripService.Register(1, "user@example.com"));
-        Assert.Equal($"The registration limit for trip with ID 1 has been exceeded.Number of seats is 50.", exception.Message);
+        var exception =
+            await Assert.ThrowsAsync<TripRegistrationLimitExceededException>(() =>
+                _tripService.Register(1, "user@example.com"));
+        Assert.Equal("The registration limit for trip with ID 1 has been exceeded.Number of seats is 50.",
+            exception.Message);
         _mockDbContext.Verify();
     }
 
@@ -520,8 +524,10 @@ public class TripServiceTests
             .ReturnsDbSet(trips);
 
         var exception = await Assert.ThrowsAsync<InputException>(() => _tripService.Register(1, "user@example.com"));
-        Assert.True(nameof(registration.Email).Equals(exception.ParamName, StringComparison.InvariantCultureIgnoreCase));
-        Assert.StartsWith($"The email address user@example.com is already registered for trip with ID 1.", exception.Message);
+        Assert.True(nameof(registration.Email)
+            .Equals(exception.ParamName, StringComparison.InvariantCultureIgnoreCase));
+        Assert.StartsWith("The email address user@example.com is already registered for trip with ID 1.",
+            exception.Message);
         _mockDbContext.Verify();
     }
 
@@ -538,7 +544,7 @@ public class TripServiceTests
         var trips = new List<Trip> { trip! };
         _mockDbContext.Setup(db => db.Trips)
             .ReturnsDbSet(trips);
-        
+
         _mockDbContext.Setup(db => db.Registrations)
             .ReturnsDbSet(registrations);
         _mockDbContext.Setup(x => x.Registrations.AddAsync(It.IsAny<Registration>(), It.IsAny<CancellationToken>()))
@@ -547,7 +553,7 @@ public class TripServiceTests
                 model.ID = 1;
                 registrations.Add(model);
             });
-        
+
         await _tripService.Register(1, "user@example.com");
 
         Assert.Single(registrations);
