@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>BackendTripRecruitmentTask.API</RootNamespace>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>

@@ -4,6 +4,7 @@ using BackendTripRecruitmentTask.Application.Services;
 using BackendTripRecruitmentTask.Infrastructure.Data;
 using BackendTripRecruitmentTask.Infrastructure.Seeders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,8 +27,12 @@ builder.Services.AddScoped<ITripService, TripService>();
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+builder.Services.AddSwaggerGen(c =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -37,7 +42,6 @@ await DbSeeder.EnsureDatabaseSeeded(app);
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
@@ -46,6 +50,8 @@ app.MapControllers();
 
 app.Run();
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public partial class Program
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 {
 }
