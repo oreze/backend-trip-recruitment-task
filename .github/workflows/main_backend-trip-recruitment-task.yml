@@ -30,8 +30,8 @@ jobs:
 
       - name: Test
         run: |
-          dotnet test -c Release --no-build --verbosity normal BackendTripRecruitmentTask.UnitTests
-          dotnet test -c Release --no-build --verbosity normal BackendTripRecruitmentTask.IntegrationTests
+          dotnet test -c Release --no-build --verbosity normal src/BackendTripRecruitmentTask.UnitTests
+          dotnet test -c Release --no-build --verbosity normal src/BackendTripRecruitmentTask.IntegrationTests
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
