@@ -30,7 +30,7 @@ public class TripService(TripDbContext dbContext) : ITripService
 
         var trip = Trip.Create(createTripDto.Name, createTripDto.Description, createTripDto.StartDate,
             createTripDto.NumberOfSeats, country);
-        await _dbContext.AddAsync(trip);
+        await _dbContext.Trips.AddAsync(trip);
         await _dbContext.SaveChangesAsync();
 
         return trip.ID;

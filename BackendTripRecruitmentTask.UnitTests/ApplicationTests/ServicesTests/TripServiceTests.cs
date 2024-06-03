@@ -92,7 +92,7 @@ public class TripServiceTests
         _mockDbContext.Setup(db => db.Trips)
             .ReturnsDbSet(trips);
 
-        _mockDbContext.Setup(x => x.AddAsync(It.IsAny<Trip>(), It.IsAny<CancellationToken>()))
+        _mockDbContext.Setup(x => x.Trips.AddAsync(It.IsAny<Trip>(), It.IsAny<CancellationToken>()))
             .Callback((Trip model, CancellationToken _) =>
             {
                 model.ID = 1;
@@ -450,7 +450,7 @@ public class TripServiceTests
 
         var result = await _tripService.GetDetails(1);
 
-        Assert.Equal(trip.Name, result.Name);
+        Assert.Equal(trip!.Name, result.Name);
         Assert.Equal(trip.Country.Name, result.Country);
         Assert.Equal(trip.Description, result.Description);
         Assert.Equal(trip.StartDate, result.StartDate);
@@ -463,6 +463,96 @@ public class TripServiceTests
             Assert.Equal(registration.Email, registrationDto.Email);
             Assert.Equal(registration.RegisteredAt, registrationDto.RegisteredAt);
         }
+        _mockDbContext.Verify();
+    }
+    
+    [Fact]
+    public async Task Register_TripDoesNotExist_ThrowsNotFoundException()
+    {
+        var trips = Enumerable.Empty<Trip>();
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var exception = await Assert.ThrowsAsync<NotFoundException>(() => _tripService.Register(1, "user@example.com"));
+        Assert.Equal("Could not find trip with ID 1.", exception.Message);
+        _mockDbContext.Verify();
+    }
+
+    [Fact]
+    public async Task Register_RegistrationLimitExceeded_ThrowsTripRegistrationLimitExceededException()
+    {
+        var registrations = new List<Registration>();
+        for (var i = 0; i < 50; i++)
+        {
+            var registration = (Registration?)Activator.CreateInstance(typeof(Registration), true);
+            registrations.Add(registration!);
+        }
+
+        var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+        PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
+        PropertyHelper.SetProperty(trip, nameof(Trip.NumberOfSeats), 50);
+        PropertyHelper.SetProperty(trip, nameof(Trip.Registrations), registrations);
+
+        var trips = new List<Trip> { trip! };
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var exception = await Assert.ThrowsAsync<TripRegistrationLimitExceededException>(() => _tripService.Register(1, "user@example.com"));
+        Assert.Equal($"The registration limit for trip with ID 1 has been exceeded.Number of seats is 50.", exception.Message);
+        _mockDbContext.Verify();
+    }
+
+    [Fact]
+    public async Task Register_EmailAlreadyRegistered_ThrowsInputException()
+    {
+        var registrations = new List<Registration>();
+        var registration = (Registration?)Activator.CreateInstance(typeof(Registration), true);
+        PropertyHelper.SetProperty(registration, nameof(Registration.Email), "user@example.com");
+        registrations.Add(registration!);
+
+        var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+        PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
+        PropertyHelper.SetProperty(trip, nameof(Trip.NumberOfSeats), 50);
+        PropertyHelper.SetProperty(trip, nameof(Trip.Registrations), registrations);
+
+        var trips = new List<Trip> { trip! };
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+
+        var exception = await Assert.ThrowsAsync<InputException>(() => _tripService.Register(1, "user@example.com"));
+        Assert.True(nameof(registration.Email).Equals(exception.ParamName, StringComparison.InvariantCultureIgnoreCase));
+        Assert.StartsWith($"The email address user@example.com is already registered for trip with ID 1.", exception.Message);
+        _mockDbContext.Verify();
+    }
+
+    [Fact]
+    public async Task Register_ValidInput_AddsRegistration()
+    {
+        var registrations = new List<Registration>();
+
+        var trip = (Trip?)Activator.CreateInstance(typeof(Trip), true);
+        PropertyHelper.SetProperty(trip, nameof(Trip.ID), 1);
+        PropertyHelper.SetProperty(trip, nameof(Trip.NumberOfSeats), 50);
+        PropertyHelper.SetProperty(trip, nameof(Trip.Registrations), registrations);
+
+        var trips = new List<Trip> { trip! };
+        _mockDbContext.Setup(db => db.Trips)
+            .ReturnsDbSet(trips);
+        
+        _mockDbContext.Setup(db => db.Registrations)
+            .ReturnsDbSet(registrations);
+        _mockDbContext.Setup(x => x.Registrations.AddAsync(It.IsAny<Registration>(), It.IsAny<CancellationToken>()))
+            .Callback((Registration model, CancellationToken _) =>
+            {
+                model.ID = 1;
+                registrations.Add(model);
+            });
+        
+        await _tripService.Register(1, "user@example.com");
+
+        Assert.Single(registrations);
+        Assert.Equal("user@example.com", registrations[0].Email);
+        Assert.Equal(trip, registrations[0].Trip);
         _mockDbContext.Verify();
     }
 }
