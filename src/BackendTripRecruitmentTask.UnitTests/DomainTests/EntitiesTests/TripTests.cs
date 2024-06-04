@@ -46,6 +46,7 @@ public class TripTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("This is a test trip\nwith multiple lines.")]
+    [InlineData("This is a test trip\r\nwith multiple lines.")]
     [InlineData("This is a test trip with more than fifty characters in the name.")]
     public void Create_InvalidName_ThrowsInputException(string name)
     {

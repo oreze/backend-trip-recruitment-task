@@ -53,7 +53,7 @@ public class Trip
         if (string.IsNullOrWhiteSpace(name))
             throw new InputException(nameof(name), "Trip name cannot be null or empty.");
 
-        if (name.Contains(Environment.NewLine) || name.Length > Constants.MaximumTripNameLength)
+        if (name.Contains("\r\n") || name.Contains('\n') || name.Length > Constants.MaximumTripNameLength)
             throw new InputException(nameof(name),
                 $"Trip name must be a single line and a maximum of {Constants.MaximumTripNameLength} characters.");
 
